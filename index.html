@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watervin Academy - Mandarin Learning Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- HanziWriter SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #120305;
+      --sidebar-bg: #1a0507;
+      --card-bg: #2d0a0e;
+      --card-border: #4a151b;
+      --gold-primary: #e5a93c;
+      --gold-bright: #ffd166;
+      --text-white: #ffffff;
+      --text-muted: #b89b9e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-white); display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--card-border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      color: var(--gold-primary);
+      text-align: center;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: var(--text-white);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      background: transparent;
+      text-align: left;
+      width: 100%;
+    }
+
+    .nav-item.active {
+      background: linear-gradient(90deg, #3a0d12 0%, #26080b 100%);
+      border: 1.5px solid var(--gold-primary);
+      color: var(--gold-bright);
+    }
+
+    .nav-item:hover:not(.active) { background: rgba(229, 169, 60, 0.1); }
+
+    /* MAIN CONTENT */
+    .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+    
+    .header-banner {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px 30px;
+      margin-bottom: 24px;
+    }
+
+    .header-title { font-size: 1.8rem; color: var(--gold-primary); margin-bottom: 8px; }
+    .header-subtitle { color: var(--text-muted); font-size: 0.95rem; }
+
+    .content-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      min-height: 400px;
+    }
+
+    /* CONTROLS */
+    .controls-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: #120305;
+      border: 1px solid var(--gold-primary);
+      border-radius: 12px;
+      padding: 10px 16px;
+      color: var(--text-white);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .search-input::placeholder { color: var(--text-muted); }
+
+    /* HSK SELECTOR */
+    .hsk-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tab-btn {
+      background: #1a0507;
+      border: 1px solid var(--card-border);
+      color: var(--text-white);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--gold-primary);
+      color: #120305;
+      border-color: var(--gold-primary);
+    }
+
+    /* KAMUS GRID */
+    .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+    .vocab-card {
+      background: rgba(20, 4, 6, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .vocab-card:hover { border-color: var(--gold-primary); transform: translateY(-4px); }
+    .card-hanzi { font-size: 2.2rem; font-weight: 700; color: var(--gold-primary); margin-bottom: 6px; }
+    .card-pinyin { color: var(--gold-bright); font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+    .card-arti { color: var(--text-muted); font-size: 0.85rem; }
+    .card-level {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 0.7rem;
+      background: rgba(229, 169, 60, 0.15);
+      color: var(--gold-bright);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+    }
+
+    /* MULTI-HANZI DISPLAY */
+    .multi-section-title {
+      color: var(--gold-bright);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .multi-space-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .writing-box-single {
+      background: #120305;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      flex: 0 0 180px;
+    }
+
+    .writer-display-space {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 10px;
+      background: #120305;
+      border: 2px dashed var(--gold-primary);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .select-dropdown {
+      background: #120305;
+      color: var(--gold-bright);
+      border: 1px solid var(--gold-primary);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 15px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .btn-action {
+      background: var(--gold-primary); color: #120305; border: none;
+      padding: 8px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; margin: 4px;
+      font-size: 0.9rem;
+      transition: opacity 0.2s;
+    }
+    .btn-action:hover { opacity: 0.9; }
+    .btn-secondary { background: transparent; border: 1px solid var(--gold-primary); color: var(--gold-bright); }
+
+    /* MODAL POPUP DETAIL KAMUS */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .modal-box {
+      background: var(--card-bg); border: 2px solid var(--gold-primary);
+      border-radius: 20px; width: 92%; max-width: 580px; padding: 24px;
+      text-align: center; position: relative; max-height: 90vh; overflow-y: auto;
+    }
+    .close-btn { position: absolute; top: 12px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+
+    /* KARTU HAPALAN (FLASHCARDS) */
+    .flashcard-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .flashcard {
+      width: 100%;
+      height: 300px;
+      background: rgba(20, 4, 6, 0.8);
+      border: 2px solid var(--gold-primary);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.4s;
+      transform-style: preserve-3d;
+      padding: 20px;
+      text-align: center;
+    }
+    .flashcard-front, .flashcard-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      padding: 20px;
+    }
+    .flashcard-back {
+      transform: rotateY(180deg);
+      background: #25070a;
+      border-radius: 20px;
+    }
+    .flashcard.flipped {
+      transform: rotateY(180deg);
+    }
+    .flashcard-controls {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* POLA KALIMAT */
+    .pola-card {
+      background: rgba(20, 4, 6, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .pola-title {
+      color: var(--gold-bright);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .pola-formula {
+      background: #120305;
+      border-left: 4px solid var(--gold-primary);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-family: monospace;
+      color: var(--gold-primary);
+      margin-bottom: 10px;
+    }
+    .pola-example {
+      color: var(--text-white);
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .pola-arti {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* TES HSK & TUGAS */
+    .quiz-container {
+      max-width: 650px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .quiz-question {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gold-bright);
+      margin-bottom: 16px;
+    }
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .quiz-option-btn {
+      background: #120305;
+      border: 1px solid var(--card-border);
+      color: var(--text-white);
+      padding: 12px 16px;
+      border-radius: 12px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    .quiz-option-btn:hover {
+      border-color: var(--gold-primary);
+      background: rgba(229, 169, 60, 0.05);
+    }
+    .quiz-option-btn.correct {
+      background: rgba(40, 167, 69, 0.2);
+      border-color: #28a745;
+      color: #75b798;
+    }
+    .quiz-option-btn.wrong {
+      background: rgba(220, 53, 69, 0.2);
+      border-color: #dc3545;
+      color: #ea868f;
+    }
+
+    /* PERCAKAPAN */
+    .chat-bubble-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .chat-bubble {
+      background: #120305;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px 18px;
+    }
+    .chat-speaker {
+      font-size: 0.8rem;
+      color: var(--gold-primary);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .chat-text-zh {
+      font-size: 1.1rem;
+      color: var(--gold-bright);
+      font-weight: 600;
+    }
+    .chat-text-id {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* RAPOR & SERTIFIKAT */
+    .certificate-card {
+      background: linear-gradient(135deg, #2d0a0e 0%, #1a0507 100%);
+      border: 3px double var(--gold-primary);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR NAVIGASI -->
+  <div class="sidebar">
+    <div class="brand-title">WATERVIN ACADEMY</div>
+    <button class="nav-item active" onclick="switchMenu('kamus', this)">📖 Kamus HSK 1–4</button>
+    <button class="nav-item" onclick="switchMenu('hanzi', this)">✍️ Menulis Hanzi</button>
+    <button class="nav-item" onclick="switchMenu('tugas', this)">📝 Tugas Interaktif</button>
+    <button class="nav-item" onclick="switchMenu('percakapan', this)">🎙️ Percakapan</button>
+    <button class="nav-item" onclick="switchMenu('pola', this)">🔤 Pola Kalimat</button>
+    <button class="nav-item" onclick="switchMenu('hapalan', this)">📇 Kartu Hapalan</button>
+    <button class="nav-item" onclick="switchMenu('tes', this)">🎯 Tes HSK</button>
+    <button class="nav-item" onclick="switchMenu('rapor', this)">📜 Rapor & Sertifikat</button>
+  </div>
+
+  <!-- KONTEN UTAMA -->
+  <div class="main-content">
+    <div class="header-banner">
+      <div class="header-title" id="pageTitle">📖 Kamus HSK 1–4</div>
+      <div class="header-subtitle" id="pageDesc">Daftar kosakata resmi HSK 1 sampai HSK 4 dengan audio pengucapan interaktif & latihan tulis.[cite: 3]</div>
+    </div>
+
+    <div class="content-box" id="contentArea"></div>
+  </div>
+
+  <!-- MODAL POPUP DETAIL KAMUS -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-box">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <h2 id="modalPinyin" style="color: var(--gold-bright); font-size: 1.6rem; margin-top: 5px;">bēizi</h2>
+      <p id="modalArti" style="color: var(--text-muted); margin-bottom: 16px;">gelas, cangkir</p>
+      
+      <!-- KOTAK MULTI HANZI UNTUK MODAL -->
+      <div id="modalHanziContainer" class="multi-space-grid"></div>
+
+      <div style="margin-top: 10px;">
+        <button class="btn-action" onclick="playAudio()">🔊 Dengar Nada</button>
+        <button class="btn-action btn-secondary" onclick="animateModalStrokes()">✍ Cara Tulis (Semua)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DATABASE KOSAKATA LENGKAP (HSK 1, 2, 3, & 4)
+    const databaseHSK = {
+      'HSK 1': [
+        { hanzi: '爱', pinyin: 'ài', arti: 'suka, mencintai' },
+        { hanzi: '八', pinyin: 'bā', arti: 'delapan' },
+        { hanzi: '爸爸', pinyin: 'bàba', arti: 'ayah' },
+        { hanzi: '杯子', pinyin: 'bēizi', arti: 'gelas, cangkir' },
+        { hanzi: '北京', pinyin: 'Běijīng', arti: 'Beijing' },
+        { hanzi: '本', pinyin: 'běn', arti: 'satuan buku' },
+        { hanzi: '不客气', pinyin: 'bú kèqi', arti: 'sama-sama, tidak usah sungkan' },
+        { hanzi: '不', pinyin: 'bù', arti: 'tidak, bukan' },
+        { hanzi: '菜', pinyin: 'cài', arti: 'sayur, masakan' },
+        { hanzi: '茶', pinyin: 'chá', arti: 'teh' },
+        { hanzi: '吃', pinyin: 'chī', arti: 'makan' },
+        { hanzi: '出租车', pinyin: 'chūzūchē', arti: 'taksi' },
+        { hanzi: '打电话', pinyin: 'dǎ diànhuà', arti: 'menelepon' },
+        { hanzi: '大', pinyin: 'dà', arti: 'besar' },
+        { hanzi: '的', pinyin: 'de', arti: 'kepunyaan (partikel)' },
+        { hanzi: '点', pinyin: 'diǎn', arti: 'jam, titik, sedikit' },
+        { hanzi: '电脑', pinyin: 'diànnǎo', arti: 'komputer' },
+        { hanzi: '电视', pinyin: 'diànshì', arti: 'televisi' },
+        { hanzi: '电影', pinyin: 'diànyǐng', arti: 'film' },
+        { hanzi: '东西', pinyin: 'dōngxi', arti: 'barang, benda' },
+        { hanzi: '都', pinyin: 'dōu', arti: 'semua' },
+        { hanzi: '读', pinyin: 'dú', arti: 'membaca' },
+        { hanzi: '对不起', pinyin: 'duìbuqǐ', arti: 'maaf' },
+        { hanzi: '多', pinyin: 'duō', arti: 'banyak' },
+        { hanzi: '多少', pinyin: 'duōshao', arti: 'berapa banyak' },
+        { hanzi: '儿子', pinyin: 'érzi', arti: 'anak laki-laki' },
+        { hanzi: '二', pinyin: 'èr', arti: 'dua' },
+        { hanzi: '饭店', pinyin: 'fàndiàn', arti: 'restoran, hotel' },
+        { hanzi: '飞机', pinyin: 'fēijī', arti: 'pesawat terbang' },
+        { hanzi: '分钟', pinyin: 'fēnzhōng', arti: 'menit' },
+        { hanzi: '高兴', pinyin: 'gāoxìng', arti: 'senang' },
+        { hanzi: '个', pinyin: 'gè', arti: 'satuan umum' },
+        { hanzi: '工作', pinyin: 'gōngzuò', arti: 'bekerja, pekerjaan' },
+        { hanzi: '狗', pinyin: 'gǒu', arti: 'anjing' },
+        { hanzi: '汉语', pinyin: 'Hànyǔ', arti: 'bahasa Mandarin' },
+        { hanzi: '好', pinyin: 'hǎo', arti: 'baik, bagus' },
+        { hanzi: '号', pinyin: 'hào', arti: 'tanggal, nomor' },
+        { hanzi: '喝', pinyin: 'hē', arti: 'minum' },
+        { hanzi: '和', pinyin: 'hé', arti: 'dan, dengan' },
+        { hanzi: '很', pinyin: 'hěn', arti: 'sangat' },
+        { hanzi: '后面', pinyin: 'hòumiàn', arti: 'bagian belakang' },
+        { hanzi: '回', pinyin: 'huí', arti: 'kembali, pulang' },
+        { hanzi: '会', pinyin: 'huì', arti: 'bisa, dapat' },
+        { hanzi: '几', pinyin: 'jǐ', arti: 'berapa' },
+        { hanzi: '家', pinyin: 'jiā', arti: 'rumah, keluarga' },
+        { hanzi: '叫', pinyin: 'jiào', arti: 'dipanggil, bernama' },
+        { hanzi: '今天', pinyin: 'jīntiān', arti: 'hari ini' },
+        { hanzi: '九', pinyin: 'jiǔ', arti: 'sembilan' },
+        { hanzi: '开', pinyin: 'kāi', arti: 'buka, mengemudi' },
+        { hanzi: '看', pinyin: 'kàn', arti: 'melihat, membaca' },
+        { hanzi: '看见', pinyin: 'kànjiàn', arti: 'melihat, kelihatan' },
+        { hanzi: '块', pinyin: 'kuài', arti: 'satuan uang Yuan / potong' },
+        { hanzi: '来', pinyin: 'lái', arti: 'datang' },
+        { hanzi: '老师', pinyin: 'lǎoshī', arti: 'guru' },
+        { hanzi: '了', pinyin: 'le', arti: 'sudah (partikel)' },
+        { hanzi: '冷', pinyin: 'lěng', arti: 'dingin' },
+        { hanzi: '里', pinyin: 'lǐ', arti: 'dalam' },
+        { hanzi: '零', pinyin: 'líng', arti: 'nol' },
+        { hanzi: '六', pinyin: 'liù', arti: 'enam' },
+        { hanzi: '妈妈', pinyin: 'māma', arti: 'ibu' },
+        { hanzi: '吗', pinyin: 'ma', arti: 'Apakah? (partikel tanya)' },
+        { hanzi: '买', pinyin: 'mǎi', arti: 'membeli' },
+        { hanzi: '猫', pinyin: 'māo', arti: 'kucing' },
+        { hanzi: '没关系', pinyin: 'méi guānxi', arti: 'tidak apa-apa' },
+        { hanzi: '没有', pinyin: 'méiyǒu', arti: 'tidak ada, tidak punya' },
+        { hanzi: '米饭', pinyin: 'mǐfàn', arti: 'nasi' },
+        { hanzi: '明天', pinyin: 'míngtiān', arti: 'besok' },
+        { hanzi: '名字', pinyin: 'míngzi', arti: 'nama' },
+        { hanzi: '哪', pinyin: 'nǎ', arti: 'mana' },
+        { hanzi: '哪儿', pinyin: 'nǎr', arti: 'di mana' },
+        { hanzi: '那', pinyin: 'nà', arti: 'itu' },
+        { hanzi: '呢', pinyin: 'ne', arti: 'bagaimana dengan? (partikel)' },
+        { hanzi: '能', pinyin: 'néng', arti: 'bisa, mampu' },
+        { hanzi: '你', pinyin: 'nǐ', arti: 'kamu' },
+        { hanzi: '年', pinyin: 'nián', arti: 'tahun' },
+        { hanzi: '女儿', pinyin: 'nǚ\'ér', arti: 'anak perempuan' },
+        { hanzi: '朋友', pinyin: 'péngyou', arti: 'teman' },
+        { hanzi: '漂亮', pinyin: 'piàoliang', arti: 'cantik, indah' },
+        { hanzi: '苹果', pinyin: 'píngguǒ', arti: 'apel' },
+        { hanzi: '七', pinyin: 'qī', arti: 'tujuh' },
+        { hanzi: '钱', pinyin: 'qián', arti: 'uang' },
+        { hanzi: '前面', pinyin: 'qiánmiàn', arti: 'bagian depan' },
+        { hanzi: '请', pinyin: 'qǐng', arti: 'silakan, mengundang' },
+        { hanzi: '去', pinyin: 'qù', arti: 'pergi' },
+        { hanzi: '热', pinyin: 'rè', arti: 'panas' },
+        { hanzi: '人', pinyin: 'rén', arti: 'orang' },
+        { hanzi: '认识', pinyin: 'rènshi', arti: 'mengenal' },
+        { hanzi: '三', pinyin: 'sān', arti: 'tiga' },
+        { hanzi: '商店', pinyin: 'shāngdiàn', arti: 'toko' },
+        { hanzi: '上', pinyin: 'shàng', arti: 'atas, naik' },
+        { hanzi: '上午', pinyin: 'shàngwǔ', arti: 'pagi hari' },
+        { hanzi: '少', pinyin: 'shǎo', arti: 'sedikit' },
+        { hanzi: '谁', pinyin: 'shéi', arti: 'siapa' },
+        { hanzi: '什么', pinyin: 'shénme', arti: 'apa' },
+        { hanzi: '十', pinyin: 'shí', arti: 'sepuluh' },
+        { hanzi: '时候', pinyin: 'shíhou', arti: 'waktu, saat' },
+        { hanzi: '是', pinyin: 'shì', arti: 'adalah' },
+        { hanzi: '书', pinyin: 'shū', arti: 'buku' },
+        { hanzi: '水', pinyin: 'shuǐ', arti: 'air' },
+        { hanzi: '水果', pinyin: 'shuǐguǒ', arti: 'buah-buahan' },
+        { hanzi: '睡觉', pinyin: 'shuìjiào', arti: 'tidur' },
+        { hanzi: '说话', pinyin: 'shuōhuà', arti: 'berbicara' },
+        { hanzi: '四', pinyin: 'sì', arti: 'empat' },
+        { hanzi: '岁', pinyin: 'suì', arti: 'tahun (umur)' },
+        { hanzi: '他', pinyin: 'tā', arti: 'dia (laki-laki)' },
+        { hanzi: '她', pinyin: 'tā', arti: 'dia (perempuan)' },
+        { hanzi: '太', pinyin: 'tài', arti: 'terlalu' },
+        { hanzi: '天气', pinyin: 'tiānqì', arti: 'cuaca' },
+        { hanzi: '听', pinyin: 'tīng', arti: 'mendengar' },
+        { hanzi: '同学', pinyin: 'tóngxué', arti: 'teman sekelas' },
+        { hanzi: '喂', pinyin: 'wèi', arti: 'halo (telepon)' },
+        { hanzi: '我', pinyin: 'wǒ', arti: 'saya' },
+        { hanzi: '我们', pinyin: 'wǒmen', arti: 'kami, kita' },
+        { hanzi: '五', pinyin: 'wǔ', arti: 'lima' },
+        { hanzi: '喜欢', pinyin: 'xǐhuan', arti: 'suka' },
+        { hanzi: '下', pinyin: 'xià', arti: 'bawah, turun' },
+        { hanzi: '下午', pinyin: 'xiàwǔ', arti: 'sore hari' },
+        { hanzi: '下雨', pinyin: 'xiàyǔ', arti: 'hujan' },
+        { hanzi: '先生', pinyin: 'xiānsheng', arti: 'Tuan, Bapak' },
+        { hanzi: '现在', pinyin: 'xiànzài', arti: 'sekarang' },
+        { hanzi: '想', pinyin: 'xiǎng', arti: 'ingin, berpikir, rindu' },
+        { hanzi: '小', pinyin: 'xiǎo', arti: 'kecil' },
+        { hanzi: '小姐', pinyin: 'xiǎojiě', arti: 'Nona' },
+        { hanzi: '些', pinyin: 'xiē', arti: 'beberapa' },
+        { hanzi: '写', pinyin: 'xiě', arti: 'menulis' },
+        { hanzi: '谢谢', pinyin: 'xièxie', arti: 'terima kasih' },
+        { hanzi: '星期', pinyin: 'xīngqī', arti: 'minggu, hari' },
+        { hanzi: '学生', pinyin: 'xuésheng', arti: 'siswa, murid' },
+        { hanzi: '学习', pinyin: 'xuéxí', arti: 'belajar' },
+        { hanzi: '学校', pinyin: 'xuéxiào', arti: 'sekolah' },
+        { hanzi: '一', pinyin: 'yī', arti: 'satu' },
+        { hanzi: '一点儿', pinyin: 'yìdiǎnr', arti: 'sedikit' },
+        { hanzi: '衣服', pinyin: 'yīfu', arti: 'pakaian' },
+        { hanzi: '医生', pinyin: 'yīshēng', arti: 'dokter' },
+        { hanzi: '医院', pinyin: 'yīyuàn', arti: 'rumah sakit' },
+        { hanzi: '椅子', pinyin: 'yǐzi', arti: 'kursi' },
+        { hanzi: '有', pinyin: 'yǒu', arti: 'ada, punya' },
+        { hanzi: '月', pinyin: 'yuè', arti: 'bulan' },
+        { hanzi: '再见', pinyin: 'zàijiàn', arti: 'sampai jumpa' },
+        { hanzi: '在', pinyin: 'zài', arti: 'di, sedang' },
+        { hanzi: '怎么', pinyin: 'zěnme', arti: 'bagaimana' },
+        { hanzi: '怎么样', pinyin: 'zěnmeyàng', arti: 'bagaimana menurutmu' },
+        { hanzi: '这', pinyin: 'zhè', arti: 'ini' },
+        { hanzi: '中国', pinyin: 'Zhōngguó', arti: 'Tiongkok' },
+        { hanzi: '中午', pinyin: 'zhōngwǔ', arti: 'siang hari' },
+        { hanzi: '住', pinyin: 'zhù', arti: 'tinggal' },
+        { hanzi: '桌子', pinyin: 'zhuōzi', arti: 'meja' },
+        { hanzi: '字', pinyin: 'zì', arti: 'karakter, huruf' },
+        { hanzi: '昨天', pinyin: 'zuótiān', arti: 'kemarin' },
+        { hanzi: '坐', pinyin: 'zuò', arti: 'duduk, naik kendaraan' },
+        { hanzi: '做', pinyin: 'zuò', arti: 'membuat, melakukan' }
+      ],
+      'HSK 2': [
+        { hanzi: '吧', pinyin: 'ba', arti: 'partikel saran' },
+        { hanzi: '白', pinyin: 'bái', arti: 'putih' },
+        { hanzi: '百', pinyin: 'bǎi', arti: 'ratus' },
+        { hanzi: '帮助', pinyin: 'bāngzhù', arti: 'membantu' },
+        { hanzi: '报纸', pinyin: 'bàozhǐ', arti: 'koran' },
+        { hanzi: '比', pinyin: 'bǐ', arti: 'daripada (perbandingan)' },
+        { hanzi: '别', pinyin: 'bié', arti: 'jangan' },
+        { hanzi: '长', pinyin: 'cháng', arti: 'panjang' },
+        { hanzi: '唱歌', pinyin: 'chànggē', arti: 'bernanyi' },
+        { hanzi: '出', pinyin: 'chū', arti: 'keluar' },
+        { hanzi: '穿', pinyin: 'chuān', arti: 'memakai (baju)' },
+        { hanzi: '次', pinyin: 'cì', arti: 'kali (frekuensi)' },
+        { hanzi: '从', pinyin: 'cóng', arti: 'dari' },
+        { hanzi: '错', pinyin: 'cuò', arti: 'salah' },
+        { hanzi: '打篮球', pinyin: 'dǎ lánqiú', arti: 'bermain basket' },
+        { hanzi: '大家', pinyin: 'dàjiā', arti: 'semua orang' },
+        { hanzi: '到', pinyin: 'dào', arti: 'sampai, tiba' },
+        { hanzi: '得', pinyin: 'de', arti: 'partikel pelengkap' },
+        { hanzi: '等', pinyin: 'děng', arti: 'menunggu' },
+        { hanzi: '弟弟', pinyin: 'dìdi', arti: 'adik laki-laki' },
+        { hanzi: '第一', pinyin: 'dì-yī', arti: 'pertama' },
+        { hanzi: '懂', pinyin: 'dǒng', arti: 'mengerti, paham' },
+        { hanzi: '对', pinyin: 'duì', arti: 'benar, terhadap' },
+        { hanzi: '房间', pinyin: 'fángjiān', arti: 'kamar' },
+        { hanzi: '非常', pinyin: 'fēicháng', arti: 'sangat' },
+        { hanzi: '服务员', pinyin: 'fúwùyuán', arti: 'pelayan' },
+        { hanzi: '高', pinyin: 'gāo', arti: 'tinggi' },
+        { hanzi: '告诉', pinyin: 'gàosu', arti: 'memberitahu' },
+        { hanzi: '哥哥', pinyin: 'gēge', arti: 'kakak laki-laki' },
+        { hanzi: '给', pinyin: 'gěi', arti: 'memberi' },
+        { hanzi: '公共汽车', pinyin: 'gōnggòng qìchē', arti: 'bus umum' },
+        { hanzi: '公斤', pinyin: 'gōngjīn', arti: 'kilogram' },
+        { hanzi: '公司', pinyin: 'gōngsī', arti: 'perusahaan' },
+        { hanzi: '贵', pinyin: 'guì', arti: 'mahal' },
+        { hanzi: '过', pinyin: 'guò', arti: 'pernah / melewati' },
+        { hanzi: '还', pinyin: 'hái', arti: 'masih, juga' },
+        { hanzi: '孩子', pinyin: 'háizi', arti: 'anak' },
+        { hanzi: '黑', pinyin: 'hēi', arti: 'hitam' },
+        { hanzi: '红', pinyin: 'hóng', arti: 'merah' },
+        { hanzi: '欢迎', pinyin: 'huānyíng', arti: 'menyambut' },
+        { hanzi: '回答', pinyin: 'huídá', arti: 'menjawab' },
+        { hanzi: '机场', pinyin: 'jīchǎng', arti: 'bandara' },
+        { hanzi: '鸡蛋', pinyin: 'jīdàn', arti: 'telur ayam' },
+        { hanzi: '件', pinyin: 'jiàn', arti: 'satuan pakaian/pakaian' },
+        { hanzi: '教室', pinyin: 'jiàoshì', arti: 'ruang kelas' },
+        { hanzi: '姐姐', pinyin: 'jiějie', arti: 'kakak perempuan' },
+        { hanzi: '介绍', pinyin: 'jièshào', arti: 'memperkenalkan' },
+        { hanzi: '进', pinyin: 'jìn', arti: 'masuk' },
+        { hanzi: '近', pinyin: 'jìn', arti: 'dekat' },
+        { hanzi: '就', pinyin: 'jiù', arti: 'langsung, maka' },
+        { hanzi: '觉得', pinyin: 'juéde', arti: 'merasa, berpendapat' },
+        { hanzi: '咖啡', pinyin: 'kāfēi', arti: 'kopi' },
+        { hanzi: '开始', pinyin: 'kāishǐ', arti: 'mulai' },
+        { hanzi: '考试', pinyin: 'kǎoshì', arti: 'ujian' },
+        { hanzi: '可能', pinyin: 'kěnéng', arti: 'mungkin' },
+        { hanzi: '可以', pinyin: 'kěyǐ', arti: 'boleh, bisa' },
+        { hanzi: '课', pinyin: 'kè', arti: 'pelajaran' },
+        { hanzi: '快', pinyin: 'kuài', arti: 'cepat' },
+        { hanzi: '快乐', pinyin: 'kuàilè', arti: 'gembira, bahagia' },
+        { hanzi: '累', pinyin: 'lèi', arti: 'lelah' },
+        { hanzi: '离', pinyin: 'lí', arti: 'jarak dari' },
+        { hanzi: '两', pinyin: 'liǎng', arti: 'dua (kuantitas)' },
+        { hanzi: '零', pinyin: 'líng', arti: 'nol' },
+        { hanzi: '路', pinyin: 'lù', arti: 'jalan' },
+        { hanzi: '旅游', pinyin: 'lǚyóu', arti: 'berwisata, traveling' },
+        { hanzi: '卖', pinyin: 'mài', arti: 'menjual' },
+        { hanzi: '慢', pinyin: 'màn', arti: 'pelan, lambat' },
+        { hanzi: '忙', pinyin: 'máng', arti: 'sibuk' },
+        { hanzi: '每', pinyin: 'měi', arti: 'setiap' },
+        { hanzi: '妹妹', pinyin: 'mèimei', arti: 'adik perempuan' },
+        { hanzi: '门', pinyin: 'mén', arti: 'pintu' },
+        { hanzi: '面条', pinyin: 'miàntiáo', arti: 'mie' },
+        { hanzi: '男', pinyin: 'nán', arti: 'pria' },
+        { hanzi: '您', pinyin: 'nín', arti: 'Anda (sopan)' },
+        { hanzi: '牛奶', pinyin: 'niúnǎi', arti: 'susu sapi' },
+        { hanzi: '女', pinyin: 'nǚ', arti: 'wanita' },
+        { hanzi: '旁边', pinyin: 'pángbiān', arti: 'samping, sebelah' },
+        { hanzi: '跑步', pinyin: 'pǎobù', arti: 'berlari' },
+        { hanzi: '便宜', pinyin: 'piányi', arti: 'murah' },
+        { hanzi: '票', pinyin: 'piào', arti: 'tiket' },
+        { hanzi: '妻子', pinyin: 'qīzi', arti: 'istri' },
+        { hanzi: '起床', pinyin: 'qǐchuáng', arti: 'bangun tidur' },
+        { hanzi: '千', pinyin: 'qiān', arti: 'ribu' },
+        { hanzi: '铅笔', pinyin: 'qiānbǐ', arti: 'pensil' },
+        { hanzi: '晴', pinyin: 'qíng', arti: 'cerah' },
+        { hanzi: '去年', pinyin: 'qùnián', arti: 'tahun lalu' },
+        { hanzi: '让', pinyin: 'ràng', arti: 'membiarkan, menyuruh' },
+        { hanzi: '日', pinyin: 'rì', arti: 'hari, tanggal' },
+        { hanzi: '上班', pinyin: 'shàngbān', arti: 'pergi bekerja' },
+        { hanzi: '身体', pinyin: 'shēntǐ', arti: 'tubuh, kesehatan' },
+        { hanzi: '生病', pinyin: 'shēngbìng', arti: 'sakit' },
+        { hanzi: '生日', pinyin: 'shēngrì', arti: 'hari ulang tahun' },
+        { hanzi: '时间', pinyin: 'shíjiān', arti: 'waktu' },
+        { hanzi: '事情', pinyin: 'shìqing', arti: 'hal, urusan' },
+        { hanzi: '手表', pinyin: 'shǒubiǎo', arti: 'jam tangan' },
+        { hanzi: '手机', pinyin: 'shǒujī', arti: 'handphone' },
+        { hanzi: '说话', pinyin: 'shuōhuà', arti: 'bicara' },
+        { hanzi: '送', pinyin: 'sòng', arti: 'mengirim, mengantar, memberi' },
+        { hanzi: '它', pinyin: 'tā', arti: 'dia (hewan/benda)' },
+        { hanzi: '踢足球', pinyin: 'tī zúqiú', arti: 'bermain sepak bola' },
+        { hanzi: '题', pinyin: 'tí', arti: 'soal, pertanyaan' },
+        { hanzi: '跳舞', pinyin: 'tiàowǔ', arti: 'menari' },
+        { hanzi: '外', pinyin: 'wài', arti: 'luar' },
+        { hanzi: '完', pinyin: 'wán', arti: 'selesai' },
+        { hanzi: '玩', pinyin: 'wán', arti: 'bermain' },
+        { hanzi: '晚上', pinyin: 'wǎnshang', arti: 'malam hari' },
+        { hanzi: '为什么', pinyin: 'wèishénme', arti: 'mengapa' },
+        { hanzi: '问', pinyin: 'wèn', arti: 'bertanya' },
+        { hanzi: '问题', pinyin: 'wèntí', arti: 'masalah, pertanyaan' },
+        { hanzi: '西瓜', pinyin: 'xīguā', arti: 'semangka' },
+        { hanzi: '希望', pinyin: 'xīwàng', arti: 'berharap' },
+        { hanzi: '洗', pinyin: 'xǐ', arti: 'mencuci' },
+        { hanzi: '小时', pinyin: 'xiǎoshí', arti: 'jam (durasi)' },
+        { hanzi: '笑', pinyin: 'xiào', arti: 'tertawa, tersenyum' },
+        { hanzi: '新', pinyin: 'xīn', arti: 'baru' },
+        { hanzi: '姓', pinyin: 'xìng', arti: 'marga' },
+        { hanzi: '休息', pinyin: 'xiūxi', arti: 'istirahat' },
+        { hanzi: '雪', pinyin: 'xuě', arti: 'salju' },
+        { hanzi: '颜色', pinyin: 'yánsè', arti: 'warna' },
+        { hanzi: '眼睛', pinyin: 'yǎnjing', arti: 'mata' },
+        { hanzi: '羊肉', pinyin: 'yángròu', arti: 'daging kambing' },
+        { hanzi: '药', pinyin: 'yào', arti: 'obat' },
+        { hanzi: '要', pinyin: 'yào', arti: 'ingin, mau' },
+        { hanzi: '也', pinyin: 'yě', arti: 'juga' },
+        { hanzi: '一起', pinyin: 'yìqǐ', arti: 'bersama-sama' },
+        { hanzi: '一下', pinyin: 'yíxià', arti: 'sebentar' },
+        { hanzi: '意思', pinyin: 'yìsi', arti: 'arti, maksud' },
+        { hanzi: '因为', pinyin: 'yīnwèi', arti: 'karena' },
+        { hanzi: '阴', pinyin: 'yīn', arti: 'mendung' },
+        { hanzi: '游泳', pinyin: 'yóuyǒng', arti: 'berenang' },
+        { hanzi: '右边', pinyin: 'yòubian', arti: 'sebelah kanan' },
+        { hanzi: '鱼', pinyin: 'yú', arti: 'ikan' },
+        { hanzi: '远', pinyin: 'yuǎn', arti: 'jauh' },
+        { hanzi: '运动', pinyin: 'yùndòng', arti: 'olahraga' },
+        { hanzi: '再', pinyin: 'zài', arti: 'lagi (akan datang)' },
+        { hanzi: '早上', pinyin: 'zǎoshang', arti: 'pagi-pagi' },
+        { hanzi: '丈夫', pinyin: 'zhàngfu', arti: 'suami' },
+        { hanzi: '找', pinyin: 'zhǎo', arti: 'mencari' },
+        { hanzi: '着', pinyin: 'zhe', arti: 'partikel berlangsung' },
+        { hanzi: '真', pinyin: 'zhēn', arti: 'sungguh, sangat' },
+        { hanzi: '正在', pinyin: 'zhèngzài', arti: 'sedang' },
+        { hanzi: '知道', pinyin: 'zhīdào', arti: 'tahu, mengetahui' },
+        { hanzi: '准备', pinyin: 'zhǔnbèi', arti: 'mempersiapkan' },
+        { hanzi: '自行车', pinyin: 'zìxíngchē', arti: 'sepeda' },
+        { hanzi: '走', pinyin: 'zǒu', arti: 'jalan' },
+        { hanzi: '最', pinyin: 'zuì', arti: 'paling' },
+        { hanzi: '左边', pinyin: 'zuǒbian', arti: 'sebelah kiri' }
+      ],
+      'HSK 3': [
+        { hanzi: '啊', pinyin: 'a', arti: 'aah; partikel seru' },
+        { hanzi: '阿姨', pinyin: 'āyí', arti: 'tante; bibi' },
+        { hanzi: '矮', pinyin: 'ǎi', arti: 'pendek; rendah' },
+        { hanzi: '爱好', pinyin: 'àihào', arti: 'hobi; kesukaan' },
+        { hanzi: '安静', pinyin: 'ānjìng', arti: 'tenang; sunyi' },
+        { hanzi: '把', pinyin: 'bǎ', arti: 'partikel 把' },
+        { hanzi: '搬', pinyin: 'bān', arti: 'memindahkan' },
+        { hanzi: '班', pinyin: 'bān', arti: 'kelas' },
+        { hanzi: '办法', pinyin: 'bànfǎ', arti: 'cara; metode' },
+        { hanzi: '办公室', pinyin: 'bàngōngshì', arti: 'kantor' },
+        { hanzi: '半', pinyin: 'bàn', arti: 'setengah' },
+        { hanzi: '帮忙', pinyin: 'bāngmáng', arti: 'membantu' },
+        { hanzi: '包', pinyin: 'bāo', arti: 'tas; bungkus' },
+        { hanzi: '饱', pinyin: 'bǎo', arti: 'kenyang' },
+        { hanzi: '北方', pinyin: 'běifāng', arti: 'wilayah utara' },
+        { hanzi: '被', pinyin: 'bèi', arti: 'oleh; partikel pasif' },
+        { hanzi: '鼻子', pinyin: 'bízi', arti: 'hidung' },
+        { hanzi: '比较', pinyin: 'bǐjiào', arti: 'cukup; relatif' },
+        { hanzi: '比赛', pinyin: 'bǐsài', arti: 'pertandingan; kompetisi' },
+        { hanzi: '笔记本', pinyin: 'bǐjìběn', arti: 'buku catatan' },
+        { hanzi: '必须', pinyin: 'bìxū', arti: 'harus' },
+        { hanzi: '变化', pinyin: 'biànhuà', arti: 'perubahan' },
+        { hanzi: '表示', pinyin: 'biǎoshì', arti: 'menyatakan' },
+        { hanzi: '表演', pinyin: 'biǎoyǎn', arti: 'pertunjukan' },
+        { hanzi: '别的', pinyin: 'biéde', arti: 'yang lain' },
+        { hanzi: '别人', pinyin: 'biérén', arti: 'orang lain' },
+        { hanzi: '冰箱', pinyin: 'bīngxiāng', arti: 'kulkas' },
+        { hanzi: '不但', pinyin: 'búdàn', arti: 'tidak hanya' },
+        { hanzi: '而且', pinyin: 'érqiě', arti: 'tetapi juga' },
+        { hanzi: '菜单', pinyin: 'càidān', arti: 'menu' },
+        { hanzi: '参加', pinyin: 'cānjiā', arti: 'mengikuti' },
+        { hanzi: '草', pinyin: 'cǎo', arti: 'rumput' },
+        { hanzi: '层', pinyin: 'céng', arti: 'lantai; tingkat' },
+        { hanzi: '超市', pinyin: 'chāoshì', arti: 'supermarket' },
+        { hanzi: '衬衫', pinyin: 'chènshān', arti: 'kemeja' },
+        { hanzi: '成绩', pinyin: 'chéngjì', arti: 'nilai; prestasi' },
+        { hanzi: '城市', pinyin: 'chéngshì', arti: 'kota' },
+        { hanzi: '迟到', pinyin: 'chídào', arti: 'terlambat' },
+        { hanzi: '除了', pinyin: 'chúle', arti: 'selain; kecuali' },
+        { hanzi: '船', pinyin: 'chuán', arti: 'kapal; perahu' },
+        { hanzi: '春', pinyin: 'chūn', arti: 'musim semi' },
+        { hanzi: '词典', pinyin: 'cídiǎn', arti: 'kamus' },
+        { hanzi: '聪明', pinyin: 'cōngming', arti: 'pintar; cerdas' },
+        { hanzi: '打扫', pinyin: 'dǎsǎo', arti: 'membersihkan' },
+        { hanzi: '打算', pinyin: 'dǎsuàn', arti: 'berencana' },
+        { hanzi: '带', pinyin: 'dài', arti: 'membawa' },
+        { hanzi: '担心', pinyin: 'dānxīn', arti: 'khawatir' },
+        { hanzi: '蛋糕', pinyin: 'dàngāo', arti: 'kue' },
+        { hanzi: '当然', pinyin: 'dāngrán', arti: 'tentu saja' },
+        { hanzi: '地', pinyin: 'de', arti: 'partikel keterangan' },
+        { hanzi: '灯', pinyin: 'dēng', arti: 'lampu' },
+        { hanzi: '低', pinyin: 'dī', arti: 'rendah' },
+        { hanzi: '地方', pinyin: 'dìfang', arti: 'tempat' },
+        { hanzi: '地铁', pinyin: 'dìtiě', arti: 'kereta bawah tanah' },
+        { hanzi: '地图', pinyin: 'dìtú', arti: 'peta' },
+        { hanzi: '电梯', pinyin: 'diàntī', arti: 'lift' },
+        { hanzi: '电子邮件', pinyin: 'diànzǐ yóujiàn', arti: 'email' },
+        { hanzi: '东', pinyin: 'dōng', arti: 'timur' },
+        { hanzi: '冬', pinyin: 'dōng', arti: 'musim dingin' },
+        { hanzi: '动物', pinyin: 'dòngwù', arti: 'hewan' },
+        { hanzi: '短', pinyin: 'duǎn', arti: 'pendek' },
+        { hanzi: '段', pinyin: 'duàn', arti: 'bagian; periode' },
+        { hanzi: '锻炼', pinyin: 'duànliàn', arti: 'berolahraga' },
+        { hanzi: '多么', pinyin: 'duōme', arti: 'betapa; sangat' },
+        { hanzi: '饿', pinyin: 'è', arti: 'lapar' },
+        { hanzi: '耳朵', pinyin: 'ěrduo', arti: 'telinga' },
+        { hanzi: '发烧', pinyin: 'fāshāo', arti: 'demam' },
+        { hanzi: '发现', pinyin: 'fāxiàn', arti: 'menemukan' },
+        { hanzi: '方便', pinyin: 'fāngbiàn', arti: 'praktis; nyaman' },
+        { hanzi: '放', pinyin: 'fàng', arti: 'meletakkan' },
+        { hanzi: '放心', pinyin: 'fàngxīn', arti: 'merasa tenang' },
+        { hanzi: '分', pinyin: 'fēn', arti: 'menit; poin' },
+        { hanzi: '复习', pinyin: 'fùxí', arti: 'mengulang pelajaran' },
+        { hanzi: '附近', pinyin: 'fùjìn', arti: 'sekitar; dekat' },
+        { hanzi: '干净', pinyin: 'gānjìng', arti: 'bersih' },
+        { hanzi: '感冒', pinyin: 'gǎnmào', arti: 'flu; masuk angin' },
+        { hanzi: '感兴趣', pinyin: 'gǎn xìngqù', arti: 'tertarik' },
+        { hanzi: '刚才', pinyin: 'gāngcái', arti: 'barusan' },
+        { hanzi: '根据', pinyin: 'gēnjù', arti: 'berdasarkan' },
+        { hanzi: '跟', pinyin: 'gēn', arti: 'dengan; mengikuti' },
+        { hanzi: '更', pinyin: 'gèng', arti: 'lebih; semakin' },
+        { hanzi: '公斤', pinyin: 'gōngjīn', arti: 'kilogram' },
+        { hanzi: '公园', pinyin: 'gōngyuán', arti: 'taman' },
+        { hanzi: '故事', pinyin: 'gùshi', arti: 'cerita' },
+        { hanzi: '刮风', pinyin: 'guāfēng', arti: 'angin bertiup' },
+        { hanzi: '关', pinyin: 'guān', arti: 'menutup; mematikan' },
+        { hanzi: '关系', pinyin: 'guānxi', arti: 'hubungan' },
+        { hanzi: '关心', pinyin: 'guānxīn', arti: 'peduli' },
+        { hanzi: '关于', pinyin: 'guānyú', arti: 'mengenai; tentang' },
+        { hanzi: '国家', pinyin: 'guójiā', arti: 'negara' },
+        { hanzi: '果汁', pinyin: 'guǒzhī', arti: 'jus buah' },
+        { hanzi: '过去', pinyin: 'guòqù', arti: 'masa lalu' },
+        { hanzi: '害怕', pinyin: 'hàipà', arti: 'takut' },
+        { hanzi: '河', pinyin: 'hé', arti: 'sungai' },
+        { hanzi: '黑板', pinyin: 'hēibǎn', arti: 'papan tulis' },
+        { hanzi: '后来', pinyin: 'hòulái', arti: 'kemudian' },
+        { hanzi: '护照', pinyin: 'hùzhào', arti: 'paspor' },
+        { hanzi: '花', pinyin: 'huā', arti: 'bunga' },
+        { hanzi: '画', pinyin: 'huà', arti: 'menggambar' },
+        { hanzi: '坏', pinyin: 'huài', arti: 'rusak; buruk' },
+        { hanzi: '环境', pinyin: 'huánjìng', arti: 'lingkungan' },
+        { hanzi: '换', pinyin: 'huàn', arti: 'mengganti' },
+        { hanzi: '黄河', pinyin: 'Huáng Hé', arti: 'Sungai Kuning' },
+        { hanzi: '回答', pinyin: 'huídá', arti: 'menjawab' },
+        { hanzi: '会议', pinyin: 'huìyì', arti: 'rapat' },
+        { hanzi: '或者', pinyin: 'huòzhě', arti: 'atau' },
+        { hanzi: '几乎', pinyin: 'jīhū', arti: 'hampir' },
+        { hanzi: '机会', pinyin: 'jīhuì', arti: 'kesempatan' },
+        { hanzi: '极', pinyin: 'jí', arti: 'sangat' },
+        { hanzi: '季节', pinyin: 'jìjié', arti: 'musim' },
+        { hanzi: '记得', pinyin: 'jìde', arti: 'ingat' },
+        { hanzi: '计划', pinyin: 'jìhuà', arti: 'rencana' },
+        { hanzi: '检查', pinyin: 'jiǎnchá', arti: 'memeriksa' },
+        { hanzi: '简单', pinyin: 'jiǎndān', arti: 'sederhana' },
+        { hanzi: '见面', pinyin: 'jiànmiàn', arti: 'bertemu' },
+        { hanzi: '健康', pinyin: 'jiànkāng', arti: 'sehat' },
+        { hanzi: '讲', pinyin: 'jiǎng', arti: 'berbicara' },
+        { hanzi: '教', pinyin: 'jiāo', arti: 'mengajar' },
+        { hanzi: '角', pinyin: 'jiǎo', arti: 'sudut' },
+        { hanzi: '脚', pinyin: 'jiǎo', arti: 'kaki' },
+        { hanzi: '接', pinyin: 'jiē', arti: 'menerima' },
+        { hanzi: '街道', pinyin: 'jiēdào', arti: 'jalan' },
+        { hanzi: '结婚', pinyin: 'jiéhūn', arti: 'menikah' },
+        { hanzi: '结束', pinyin: 'jiéshù', arti: 'selesai' },
+        { hanzi: '节目', pinyin: 'jiémù', arti: 'acara' },
+        { hanzi: '节日', pinyin: 'jiérì', arti: 'hari raya' },
+        { hanzi: '解决', pinyin: 'jiějué', arti: 'menyelesaikan' },
+        { hanzi: '借', pinyin: 'jiè', arti: 'meminjam' },
+        { hanzi: '经常', pinyin: 'jīngcháng', arti: 'sering' },
+        { hanzi: '经过', pinyin: 'jīngguò', arti: 'melewati' },
+        { hanzi: '经理', pinyin: 'jīnglǐ', arti: 'manajer' },
+        { hanzi: '久', pinyin: 'jiǔ', arti: 'lama' },
+        { hanzi: '旧', pinyin: 'jiù', arti: 'bekas' },
+        { hanzi: '句子', pinyin: 'jùzi', arti: 'kalimat' },
+        { hanzi: '决定', pinyin: 'juédìng', arti: 'memutuskan' },
+        { hanzi: '可爱', pinyin: 'kě\'ài', arti: 'lucu' },
+        { hanzi: '渴', pinyin: 'kě', arti: 'haus' },
+        { hanzi: '刻', pinyin: 'kè', arti: 'seperempat jam' },
+        { hanzi: '客人', pinyin: 'kèrén', arti: 'tamu' },
+        { hanzi: '空调', pinyin: 'kōngtiáo', arti: 'AC' },
+        { hanzi: '口', pinyin: 'kǒu', arti: 'mulut' },
+        { hanzi: '哭', pinyin: 'kū', arti: 'menangis' },
+        { hanzi: '裤子', pinyin: 'kùzi', arti: 'celana' },
+        { hanzi: '筷子', pinyin: 'kuàizi', arti: 'sumpit' },
+        { hanzi: '蓝', pinyin: 'lán', arti: 'biru' },
+        { hanzi: '老', pinyin: 'lǎo', arti: 'tua' },
+        { hanzi: '离开', pinyin: 'líkāi', arti: 'meninggalkan' },
+        { hanzi: '礼物', pinyin: 'lǐwù', arti: 'hadiah' },
+        { hanzi: '历史', pinyin: 'lìshǐ', arti: 'sejarah' },
+        { hanzi: '脸', pinyin: 'liǎn', arti: 'wajah' },
+        { hanzi: '练习', pinyin: 'liànxí', arti: 'berlatih' },
+        { hanzi: '辆', pinyin: 'liàng', arti: 'satuan kendaraan' },
+        { hanzi: '聊天', pinyin: 'liáotiān', arti: 'mengobrol' },
+        { hanzi: '了解', pinyin: 'liǎojiě', arti: 'memahami' },
+        { hanzi: '邻居', pinyin: 'línjū', arti: 'tetangga' },
+        { hanzi: '楼', pinyin: 'lóu', arti: 'gedung' },
+        { hanzi: '绿', pinyin: 'lǜ', arti: 'hijau' },
+        { hanzi: '马', pinyin: 'mǎ', arti: 'kuda' },
+        { hanzi: '马上', pinyin: 'mǎshàng', arti: 'segera' },
+        { hanzi: '满意', pinyin: 'mǎnyì', arti: 'puas' },
+        { hanzi: '帽子', pinyin: 'màozi', arti: 'topi' },
+        { hanzi: '米', pinyin: 'mǐ', arti: 'meter' },
+        { hanzi: '面包', pinyin: 'miànbāo', arti: 'roti' },
+        { hanzi: '明白', pinyin: 'míngbai', arti: 'mengerti' },
+        { hanzi: '拿', pinyin: 'ná', arti: 'mengambil' },
+        { hanzi: '奶奶', pinyin: 'nǎinai', arti: 'nenek' },
+        { hanzi: '南', pinyin: 'nán', arti: 'selatan' },
+        { hanzi: '难', pinyin: 'nán', arti: 'sulit' },
+        { hanzi: '难过', pinyin: 'nánguò', arti: 'sedih' },
+        { hanzi: '年级', pinyin: 'niánjí', arti: 'tingkat kelas' },
+        { hanzi: '年轻', pinyin: 'niánqīng', arti: 'muda' },
+        { hanzi: '鸟', pinyin: 'niǎo', arti: 'burung' },
+        { hanzi: '努力', pinyin: 'nǔlì', arti: 'berusaha keras' },
+        { hanzi: '爬山', pinyin: 'páshān', arti: 'mendaki gunung' },
+        { hanzi: '盘子', pinyin: 'pánzi', arti: 'piring' },
+        { hanzi: '胖', pinyin: 'pàng', arti: 'gemuk' },
+        { hanzi: '皮鞋', pinyin: 'píxié', arti: 'sepatu kulit' },
+        { hanzi: '瓶子', pinyin: 'píngzi', arti: 'botol' },
+        { hanzi: '啤酒', pinyin: 'píjiǔ', arti: 'bir' },
+        { hanzi: '葡萄', pinyin: 'pútao', arti: 'anggur' },
+        { hanzi: '普通话', pinyin: 'Pǔtōnghuà', arti: 'Mandarin standar' },
+        { hanzi: '其实', pinyin: 'qíshí', arti: 'sebenarnya' },
+        { hanzi: '其他', pinyin: 'qítā', arti: 'yang lain' },
+        { hanzi: '奇怪', pinyin: 'qíguài', arti: 'aneh' },
+        { hanzi: '骑', pinyin: 'qí', arti: 'mengendarai' },
+        { hanzi: '清楚', pinyin: 'qīngchu', arti: 'jelas' },
+        { hanzi: '秋', pinyin: 'qiū', arti: 'musim gugur' },
+        { hanzi: '裙子', pinyin: 'qúnzi', arti: 'rok' },
+        { hanzi: '然后', pinyin: 'ránhòu', arti: 'kemudian' },
+        { hanzi: '热情', pinyin: 'rèqíng', arti: 'ramah' },
+        { hanzi: '认为', pinyin: 'rènwéi', arti: 'menganggap' },
+        { hanzi: '认真', pinyin: 'rènzhēn', arti: 'serius' },
+        { hanzi: '容易', pinyin: 'róngyì', arti: 'mudah' },
+        { hanzi: '如果', pinyin: 'rúguǒ', arti: 'jika' },
+        { hanzi: '伞', pinyin: 'sǎn', arti: 'payung' },
+        { hanzi: '上网', pinyin: 'shàngwǎng', arti: 'online' },
+        { hanzi: '声音', pinyin: 'shēngyīn', arti: 'suara' },
+        { hanzi: '生气', pinyin: 'shēngqì', arti: 'marah' },
+        { hanzi: '世界', pinyin: 'shìjiè', arti: 'dunia' },
+        { hanzi: '试', pinyin: 'shì', arti: 'mencoba' },
+        { hanzi: '瘦', pinyin: 'shòu', arti: 'kurus' },
+        { hanzi: '叔叔', pinyin: 'shūshu', arti: 'paman' },
+        { hanzi: '舒服', pinyin: 'shūfu', arti: 'nyaman' },
+        { hanzi: '数学', pinyin: 'shùxué', arti: 'matematika' },
+        { hanzi: '树', pinyin: 'shù', arti: 'pohon' },
+        { hanzi: '刷牙', pinyin: 'shuāyá', arti: 'menggosok gigi' },
+        { hanzi: '双', pinyin: 'shuāng', arti: 'sepasang' },
+        { hanzi: '水平', pinyin: 'shuǐpíng', arti: 'tingkat' },
+        { hanzi: '司机', pinyin: 'sījī', arti: 'sopir' },
+        { hanzi: '太阳', pinyin: 'tàiyáng', arti: 'matahari' },
+        { hanzi: '特别', pinyin: 'tèbié', arti: 'khusus' },
+        { hanzi: '疼', pinyin: 'téng', arti: 'sakit' },
+        { hanzi: '提高', pinyin: 'tígāo', arti: 'meningkatkan' },
+        { hanzi: '体育', pinyin: 'tǐyù', arti: 'olahraga' },
+        { hanzi: '甜', pinyin: 'tián', arti: 'manis' },
+        { hanzi: '条', pinyin: 'tiáo', arti: 'satuan panjang' },
+        { hanzi: '同事', pinyin: 'tóngshì', arti: 'rekan kerja' },
+        { hanzi: '同意', pinyin: 'tóngyì', arti: 'setuju' },
+        { hanzi: '头发', pinyin: 'tóufa', arti: 'rambut' },
+        { hanzi: '突然', pinyin: 'tūrán', arti: 'tiba-tiba' },
+        { hanzi: '图书馆', pinyin: 'túshūguǎn', arti: 'perpustakaan' },
+        { hanzi: '腿', pinyin: 'tuǐ', arti: 'kaki' },
+        { hanzi: '完成', pinyin: 'wánchéng', arti: 'menyelesaikan' },
+        { hanzi: '碗', pinyin: 'wǎn', arti: 'mangkuk' },
+        { hanzi: '万', pinyin: 'wàn', arti: 'sepuluh ribu' },
+        { hanzi: '忘记', pinyin: 'wàngjì', arti: 'lupa' },
+        { hanzi: '为', pinyin: 'wèi', arti: 'untuk' },
+        { hanzi: '为了', pinyin: 'wèile', arti: 'demi' },
+        { hanzi: '位', pinyin: 'wèi', arti: 'satuan orang' },
+        { hanzi: '文化', pinyin: 'wénhuà', arti: 'budaya' },
+        { hanzi: '西', pinyin: 'xī', arti: 'barat' },
+        { hanzi: '习惯', pinyin: 'xíguàn', arti: 'kebiasaan' },
+        { hanzi: '洗手间', pinyin: 'xǐshǒujiān', arti: 'toilet' },
+        { hanzi: '洗澡', pinyin: 'xǐzǎo', arti: 'mandi' },
+        { hanzi: '夏', pinyin: 'xià', arti: 'musim panas' },
+        { hanzi: '相信', pinyin: 'xiāngxìn', arti: 'percaya' },
+        { hanzi: '香蕉', pinyin: 'xiāngjiāo', arti: 'pisang' },
+        { hanzi: '向', pinyin: 'xiàng', arti: 'menuju' },
+        { hanzi: '像', pinyin: 'xiàng', arti: 'seperti' },
+        { hanzi: '小心', pinyin: 'xiǎoxīn', arti: 'hati-hati' },
+        { hanzi: '校长', pinyin: 'xiàozhǎng', arti: 'kepala sekolah' },
+        { hanzi: '新闻', pinyin: 'xīnwén', arti: 'berita' },
+        { hanzi: '新鲜', pinyin: 'xīnxiān', arti: 'segar' },
+        { hanzi: '信用卡', pinyin: 'xìnyòngkǎ', arti: 'kartu kredit' },
+        { hanzi: '行李箱', pinyin: 'xínglǐxiāng', arti: 'koper' },
+        { hanzi: '熊猫', pinyin: 'xióngmāo', arti: 'panda' },
+        { hanzi: '需要', pinyin: 'xūyào', arti: 'membutuhkan' },
+        { hanzi: '选择', pinyin: 'xuǎnzé', arti: 'memilih' },
+        { hanzi: '要求', pinyin: 'yāoqiú', arti: 'meminta' },
+        { hanzi: '爷爷', pinyin: 'yéye', arti: 'kakek' },
+        { hanzi: '一直', pinyin: 'yìzhí', arti: 'terus-menerus' },
+        { hanzi: '一定', pinyin: 'yídìng', arti: 'pasti' },
+        { hanzi: '一共', pinyin: 'yígòng', arti: 'total' },
+        { hanzi: '一会儿', pinyin: 'yíhuìr', arti: 'sebentar' },
+        { hanzi: '一样', pinyin: 'yíyàng', arti: 'sama' },
+        { hanzi: '以前', pinyin: 'yǐqián', arti: 'sebelumnya' },
+        { hanzi: '一般', pinyin: 'yìbān', arti: 'biasanya' },
+        { hanzi: '一边', pinyin: 'yìbiān', arti: 'sambil' },
+        { hanzi: '音乐', pinyin: 'yīnyuè', arti: 'musik' },
+        { hanzi: '银行', pinyin: 'yínháng', arti: 'bank' },
+        { hanzi: '饮料', pinyin: 'yǐnliào', arti: 'minuman' },
+        { hanzi: '应该', pinyin: 'yīnggāi', arti: 'seharusnya' },
+        { hanzi: '影响', pinyin: 'yǐngxiǎng', arti: 'memengaruhi' },
+        { hanzi: '游戏', pinyin: 'yóuxì', arti: 'permainan' },
+        { hanzi: '有名', pinyin: 'yǒumíng', arti: 'terkenal' },
+        { hanzi: '又', pinyin: 'yòu', arti: 'lagi' },
+        { hanzi: '遇到', pinyin: 'yùdào', arti: 'bertemu' },
+        { hanzi: '元', pinyin: 'yuán', arti: 'yuan' },
+        { hanzi: '愿意', pinyin: 'yuànyì', arti: 'bersedia' },
+        { hanzi: '月亮', pinyin: 'yuèliang', arti: 'bulan' },
+        { hanzi: '越', pinyin: 'yuè', arti: 'semakin' },
+        { hanzi: '云', pinyin: 'yún', arti: 'awan' },
+        { hanzi: '站', pinyin: 'zhàn', arti: 'berdiri' },
+        { hanzi: '张', pinyin: 'zhāng', arti: 'satuan datar' },
+        { hanzi: '照顾', pinyin: 'zhàogù', arti: 'merawat' },
+        { hanzi: '照片', pinyin: 'zhàopiàn', arti: 'foto' },
+        { hanzi: '照相机', pinyin: 'zhàoxiàngjī', arti: 'kamera' },
+        { hanzi: '只', pinyin: 'zhǐ', arti: 'hanya' },
+        { hanzi: '中间', pinyin: 'zhōngjiān', arti: 'tengah' },
+        { hanzi: '中文', pinyin: 'Zhōngwén', arti: 'bahasa Mandarin' },
+        { hanzi: '终于', pinyin: 'zhōngyú', arti: 'akhirnya' },
+        { hanzi: '种', pinyin: 'zhǒng', arti: 'jenis' },
+        { hanzi: '重要', pinyin: 'zhòngyào', arti: 'penting' },
+        { hanzi: '周末', pinyin: 'zhōumò', arti: 'akhir pekan' },
+        { hanzi: '主要', pinyin: 'zhǔyào', arti: 'utama' },
+        { hanzi: '注意', pinyin: 'zhùyì', arti: 'memperhatikan' },
+        { hanzi: '自己', pinyin: 'zìjǐ', arti: 'diri sendiri' },
+        { hanzi: '总是', pinyin: 'zǒngshì', arti: 'selalu' },
+        { hanzi: '最后', pinyin: 'zuìhòu', arti: 'terakhir' },
+        { hanzi: '最近', pinyin: 'zuìjìn', arti: 'baru-baru ini' },
+        { hanzi: '作业', pinyin: 'zuòyè', arti: 'pekerjaan rumah' }
+      ],
+      'HSK 4': [
+        { hanzi: '爱情', pinyin: 'ài qíng', arti: 'percintaan, cinta (romantis)' },
+        { hanzi: '安排', pinyin: 'ān pái', arti: 'mengatur, merencanakan' },
+        { hanzi: '安全', pinyin: 'ān quán', arti: 'aman, keselamatan' },
+        { hanzi: '按时', pinyin: 'àn shí', arti: 'tepat waktu' },
+        { hanzi: '按照', pinyin: 'àn zhào', arti: 'berdasarkan, sesuai dengan' },
+        { hanzi: '百分之', pinyin: 'bǎi fēn zhī', arti: 'persen (%)' },
+        { hanzi: '棒', pinyin: 'bàng', arti: 'hebat, bagus sekali' },
+        { hanzi: '包子', pinyin: 'bāozi', arti: 'bakpao' },
+        { hanzi: '保护', pinyin: 'bǎo hù', arti: 'melindungi' },
+        { hanzi: '保证', pinyin: 'bǎo zhèng', arti: 'menjamin, jaminan' },
+        { hanzi: '抱', pinyin: 'bào', arti: 'memeluk' },
+        { hanzi: '抱歉', pinyin: 'bào qiàn', arti: 'meminta maaf, menyesal' },
+        { hanzi: '报道', pinyin: 'bào dào', arti: 'pemberitaan, laporan' },
+        { hanzi: '报名', pinyin: 'bào míng', arti: 'mendaftar' },
+        { hanzi: '倍', pinyin: 'bèi', arti: 'lipat (kali lipat)' },
+        { hanzi: '本来', pinyin: 'běn lái', arti: 'semula, aslinya' },
+        { hanzi: '笔记本', pinyin: 'bǐ jì běn', arti: 'laptop, buku catatan' },
+        { hanzi: '毕业', pinyin: 'bì yè', arti: 'lulus sekolah' },
+        { hanzi: '遍', pinyin: 'biàn', arti: 'kali (menyatakan keseluruhan)' },
+        { hanzi: '标准', pinyin: 'biāo zhǔn', arti: 'standar, kriteria' },
+        { hanzi: '表达', pinyin: 'biǎo dá', arti: 'menyatakan, mengekspresikan' },
+        { hanzi: '表格', pinyin: 'biǎo gé', arti: 'formulir, tabel' },
+        { hanzi: '表示', pinyin: 'biǎo shì', arti: 'menunjukkan, menyatakan' },
+        { hanzi: '表演', pinyin: 'biǎo yǎn', arti: 'pertunjukan, tampil' },
+        { hanzi: '表扬', pinyin: 'biǎo yáng', arti: 'memuji' },
+        { hanzi: '饼干', pinyin: 'bǐng gān', arti: 'biskuit, kue kering' },
+        { hanzi: '并且', pinyin: 'bìng qiě', arti: 'serta, dan juga' },
+        { hanzi: '博士', pinyin: 'bó shì', arti: 'doktor (gelar akademik)' },
+        { hanzi: '不过', pinyin: 'bú guò', arti: 'tetapi, namun' },
+        { hanzi: '不得不', pinyin: 'bù dé bù', arti: 'terpaksa, mau tidak mau' },
+        { hanzi: '不管', pinyin: 'bù guǎn', arti: 'terlepas dari, bagaimanapun' },
+        { hanzi: '不仅', pinyin: 'bù jǐn', arti: 'tidak hanya' },
+        { hanzi: '部分', pinyin: 'bù fen', arti: 'bagian' },
+        { hanzi: '擦', pinyin: 'cā', arti: 'mengelap, menyeka' },
+        { hanzi: '猜', pinyin: 'cāi', arti: 'menebak' },
+        { hanzi: '材料', pinyin: 'cái liào', arti: 'bahan, materi' },
+        { hanzi: '参观', pinyin: 'cān guān', arti: 'mengunjungi, meninjau' },
+        { hanzi: '餐厅', pinyin: 'cān tīng', arti: 'restoran, kantin' },
+        { hanzi: '厕所', pinyin: 'cè suǒ', arti: 'toilet, kamar kecil' },
+        { hanzi: '差点儿', pinyin: 'chàdiǎnr', arti: 'hampir saja' },
+        { hanzi: '长城', pinyin: 'Chángchéng', arti: 'Tembok Besar China' },
+        { hanzi: '尝', pinyin: 'cháng', arti: 'mencicipi' },
+        { hanzi: '超过', pinyin: 'chāo guò', arti: 'melebihi, melampaui' },
+        { hanzi: '成功', pinyin: 'chéng gōng', arti: 'sukses, berhasil' },
+        { hanzi: '成为', pinyin: 'chéng wéi', arti: 'menjadi' },
+        { hanzi: '诚实', pinyin: 'chéng shí', arti: 'jujur' },
+        { hanzi: '乘坐', pinyin: 'chéng zuò', arti: 'naik (kendaraan umum)' },
+        { hanzi: '吃惊', pinyin: 'chī jīng', arti: 'terkejut, kaget' },
+        { hanzi: '抽烟', pinyin: 'chōu yān', arti: 'merokok' },
+        { hanzi: '出差', pinyin: 'chū chāi', arti: 'perjalanan dinas' },
+        { hanzi: '出发', pinyin: 'chū fā', arti: 'berangkat' },
+        { hanzi: '出生', pinyin: 'chū shēng', arti: 'dilahirkan' },
+        { hanzi: '厨房', pinyin: 'chú fáng', arti: 'dapur' },
+        { hanzi: '传真', pinyin: 'chuán zhēn', arti: 'faks (fax)' },
+        { hanzi: '词典', pinyin: 'cí diǎn', arti: 'kamus' },
+        { hanzi: '从', pinyin: 'cóng', arti: 'dari' },
+        { hanzi: '聪明', pinyin: 'cōngming', arti: 'pintar, cerdas' },
+        { hanzi: '大约', pinyin: 'dà yuē', arti: 'kurang lebih, sekitar' },
+        { hanzi: '打扰', pinyin: 'dǎ rǎo', arti: 'mengganggu' },
+        { hanzi: '打印', pinyin: 'dǎ yìn', arti: 'mencetak (print)' },
+        { hanzi: '打折', pinyin: 'dǎ zhé', arti: 'diskon' },
+        { hanzi: '打针', pinyin: 'dǎ zhēn', arti: 'disuntik' },
+        { hanzi: '大概', pinyin: 'dà gài', arti: 'secara garis besar, perkiraan' },
+        { hanzi: '戴', pinyin: 'dài', arti: 'mengenakan (aksesoris: topi/kacamata)' },
+        { hanzi: '代表', pinyin: 'dài biǎo', arti: 'mewakili, perwakilan' },
+        { hanzi: '代', pinyin: 'dài', arti: 'generasi, menggantikan' },
+        { hanzi: '单子', pinyin: 'dānzi', arti: 'daftar, formulir' },
+        { hanzi: '当', pinyin: 'dāng', arti: 'menjadi, saat' },
+        { hanzi: '当时', pinyin: 'dāng shí', arti: 'pada waktu itu' },
+        { hanzi: '刀', pinyin: 'dāo', arti: 'pisau' },
+        { hanzi: '导游', pinyin: 'dǎo yóu', arti: 'pemandu wisata' },
+        { hanzi: '倒', pinyin: 'dào', arti: 'menuangkan, terbalik' },
+        { hanzi: '到处', pinyin: 'dào chù', arti: 'di mana-mana' },
+        { hanzi: '到底', pinyin: 'dào dǐ', arti: 'pada akhirnya, sebenarnya' },
+        { hanzi: '道歉', pinyin: 'dào qiàn', arti: 'meminta maaf' },
+        { hanzi: '得', pinyin: 'dé', arti: 'mendapatkan' },
+        { hanzi: '得意', pinyin: 'dé yì', arti: 'bangga diri, puas diri' },
+        { hanzi: '调查', pinyin: 'diào chá', arti: 'survei, menyelidiki' },
+        { hanzi: '丢', pinyin: 'diū', arti: 'kehilangan, membuang' },
+        { hanzi: '动作', pinyin: 'dòng zuò', arti: 'gerakan' },
+        { hanzi: '堵车', pinyin: 'dǔ chē', arti: 'macet lalu lintas' },
+        { hanzi: '肚子', pinyin: 'dùzi', arti: 'perut' },
+        { hanzi: '断', pinyin: 'duàn', arti: 'patah, putus' },
+        { hanzi: '对话', pinyin: 'duì huà', arti: 'dialog, percakapan' },
+        { hanzi: '对面的', pinyin: 'duìmiàn de', arti: 'di seberang' },
+        { hanzi: '耳朵', pinyin: 'ěrduo', arti: 'telinga' },
+        { hanzi: '儿童', pinyin: 'ér tóng', arti: 'anak-anak' },
+        { hanzi: '发', pinyin: 'fā', arti: 'mengirimkan, membagikan' },
+        { hanzi: '发生', pinyin: 'fā shēng', arti: 'terjadi' },
+        { hanzi: '发展', pinyin: 'fā zhǎn', arti: 'berkembang, pembangunan' },
+        { hanzi: '法律', pinyin: 'fǎ lǜ', arti: 'hukum, undang-undang' },
+        { hanzi: '翻译', pinyin: 'fān yì', arti: 'menerjemahkan, penerjemah' },
+        { hanzi: '烦恼', pinyin: 'fán nǎo', arti: 'kesal, pusing (masalah)' },
+        { hanzi: '范围', pinyin: 'fàn wéi', arti: 'lingkup, cakupan' },
+        { hanzi: '方便', pinyin: 'fāngbiàn', arti: 'praktis, nyaman' },
+        { hanzi: '方法', pinyin: 'fāng fǎ', arti: 'cara, metode' },
+        { hanzi: '方面', pinyin: 'fāng miàn', arti: 'aspek, bidang' },
+        { hanzi: '方向', pinyin: 'fāng xiàng', arti: 'arah' },
+        { hanzi: '访问', pinyin: 'fǎng wèn', arti: 'mengunjungi, wawancara' },
+        { hanzi: '放弃', pinyin: 'fàng qì', arti: 'menyerah' },
+        { hanzi: '放松', pinyin: 'fàng sōng', arti: 'santai, relaks' },
+        { hanzi: '份', pinyin: 'fèn', arti: 'bagian, porsi (satuan)' },
+        { hanzi: '丰富', pinyin: 'fēng fù', arti: 'kaya (variasi), melimpah' },
+        { hanzi: '风', pinyin: 'fēng', arti: 'angin' },
+        { hanzi: '风景', pinyin: 'fēng jǐng', arti: 'pemandangan' },
+        { hanzi: '否则', pinyin: 'fǒu zé', arti: 'jika tidak, kalau tidak' },
+        { hanzi: '符合', pinyin: 'fú hé', arti: 'sesuai, memenuhi' },
+        { hanzi: '父亲', pinyin: 'fù qīn', arti: 'ayah' },
+        { hanzi: '付款', pinyin: 'fù kuǎn', arti: 'membayar' },
+        { hanzi: '负责', pinyin: 'fù zé', arti: 'bertanggung jawab' },
+        { hanzi: '复印', pinyin: 'fù yìn', arti: 'fotokopi' },
+        { hanzi: '复杂', pinyin: 'fù zá', arti: 'rumit, kompleks' },
+        { hanzi: '富', pinyin: 'fù', arti: 'kaya' },
+        { hanzi: '改变', pinyin: 'gǎi biàn', arti: 'mengubah, perubahan' },
+        { hanzi: '干', pinyin: 'gàn', arti: 'melakukan, kering' },
+        { hanzi: '干净', pinyin: 'gānjìng', arti: 'bersih' },
+        { hanzi: '感冒', pinyin: 'gǎn mào', arti: 'flu, masuk angin' },
+        { hanzi: '感情', pinyin: 'gǎn qíng', arti: 'perasaan, emosi' },
+        { hanzi: '感谢', pinyin: 'gǎn xiè', arti: 'berterima kasih' },
+        { hanzi: '刚才', pinyin: 'gāng cái', arti: 'barusan' },
+        { hanzi: '高雄', pinyin: 'Gāoxióng', arti: 'Kaohsiung' },
+        { hanzi: '个子', pinyin: 'gèzi', arti: 'tinggi badan / postur tubuh' },
+        { hanzi: '根', pinyin: 'gēn', arti: 'akar, batang (satuan tipis panjang)' },
+        { hanzi: '根据', pinyin: 'gēn jù', arti: 'berdasarkan' },
+        { hanzi: '跟', pinyin: 'gēn', arti: 'dengan' },
+        { hanzi: '更', pinyin: 'gèng', arti: 'lebih' },
+        { hanzi: '公布', pinyin: 'gōng bù', arti: 'mengumumkan' },
+        { hanzi: '公共汽车', pinyin: 'gōnggòng qìchē', arti: 'bus umum' },
+        { hanzi: '公斤', pinyin: 'gōngjīn', arti: 'kilogram' },
+        { hanzi: '公开', pinyin: 'gōng kāi', arti: 'terbuka, umum' },
+        { hanzi: '公路', pinyin: 'gōng lù', arti: 'jalan raya' },
+        { hanzi: '公司', pinyin: 'gōngsī', arti: 'perusahaan' },
+        { hanzi: '公园', pinyin: 'gōngyuán', arti: 'taman' },
+        { hanzi: '功能', pinyin: 'gōng néng', arti: 'fungsi' },
+        { hanzi: '共同', pinyin: 'gòng tóng', arti: 'bersama-sama, umum' },
+        { hanzi: '够', pinyin: 'gòu', arti: 'cukup' },
+        { hanzi: '购物', pinyin: 'gòu wù', arti: 'berbelanja' },
+        { hanzi: '孤单', pinyin: 'gū dān', arti: 'kesepian' },
+        { hanzi: '估计', pinyin: 'gū jì', arti: 'memperkirakan' },
+        { hanzi: '鼓励', pinyin: 'gǔ lì', arti: 'mendorong, menyemangati' },
+        { hanzi: '故意', pinyin: 'gù yì', arti: 'sengaja' },
+        { hanzi: '顾客', pinyin: 'gù kè', arti: 'pelanggan' },
+        { hanzi: '关', pinyin: 'guān', arti: 'menutup' },
+        { hanzi: '关键', pinyin: 'guān jiàn', arti: 'kunci, poin penting' },
+        { hanzi: '关系', pinyin: 'guānxi', arti: 'hubungan' },
+        { hanzi: '关心', pinyin: 'guānxīn', arti: 'peduli' },
+        { hanzi: '关于', pinyin: 'guānyú', arti: 'mengenai' },
+        { hanzi: '国家', pinyin: 'guójiā', arti: 'negara' },
+        { hanzi: '果汁', pinyin: 'guǒzhī', arti: 'jus buah' },
+        { hanzi: '过去', pinyin: 'guò qù', arti: 'masa lalu' },
+        { hanzi: '哈哈', pinyin: 'hāhā', arti: 'haha (tertawa)' },
+        { hanzi: '海', pinyin: 'hǎi', arti: 'laut' },
+        { hanzi: '害羞', pinyin: 'hài xiū', arti: 'pemalu, malu-malu' },
+        { hanzi: '寒假', pinyin: 'hán jià', arti: 'liburan musim dingin' },
+        { hanzi: '汗', pinyin: 'hàn', arti: 'keringat' },
+        { hanzi: '航班', pinyin: 'háng bān', arti: 'penerbangan' },
+        { hanzi: '行业', pinyin: 'háng yè', arti: 'industri, bidang usaha' },
+        { hanzi: '豪华', pinyin: 'háo huá', arti: 'mewah' },
+        { hanzi: '好', pinyin: 'hǎo', arti: 'baik' },
+        { hanzi: '好吃', pinyin: 'hǎo chī', arti: 'enak' },
+        { hanzi: '号', pinyin: 'hào', arti: 'nomor/tanggal' },
+        { hanzi: '号码', pinyin: 'hào mǎ', arti: 'nomor' },
+        { hanzi: '和', pinyin: 'hé', arti: 'dan' },
+        { hanzi: '河', pinyin: 'hé', arti: 'sungai' },
+        { hanzi: '合适', pinyin: 'hé shì', arti: 'cocok, sesuai' },
+        { hanzi: '黑', pinyin: 'hēi', arti: 'hitam' },
+        { hanzi: '黑板', pinyin: 'hēibǎn', arti: 'papan tulis' },
+        { hanzi: '红', pinyin: 'hóng', arti: 'merah' },
+        { hanzi: '后', pinyin: 'hòu', arti: 'setelah, belakang' },
+        { hanzi: '后来', pinyin: 'hòu lái', arti: 'kemudian' },
+        { hanzi: '厚', pinyin: 'hòu', arti: 'tebal' },
+        { hanzi: '护照', pinyin: 'hù zhào', arti: 'paspor' },
+        { hanzi: '花', pinyin: 'huā', arti: 'bunga / menghabiskan' },
+        { hanzi: '花园', pinyin: 'huā yuán', arti: 'taman bunga' },
+        { hanzi: '画', pinyin: 'huà', arti: 'melukis' },
+        { hanzi: '坏', pinyin: 'huài', arti: 'rusak' },
+        { hanzi: '欢迎', pinyin: 'huānyíng', arti: 'menyambut' },
+        { hanzi: '环境', pinyin: 'huán jìng', arti: 'lingkungan' },
+        { hanzi: '换', pinyin: 'huàn', arti: 'menukar' },
+        { hanzi: '黄', pinyin: 'huáng', arti: 'kuning' },
+        { hanzi: '回答', pinyin: 'huí dá', arti: 'menjawab' },
+        { hanzi: '会议', pinyin: 'huì yì', arti: 'rapat' },
+        { hanzi: '或者', pinyin: 'huò zhě', arti: 'atau' },
+        { hanzi: '机会', pinyin: 'jī huì', arti: 'kesempatan' },
+        { hanzi: '极', pinyin: 'jí', arti: 'sangat' },
+        { hanzi: '极其', pinyin: 'jí qí', arti: 'sangat sekali' },
+        { hanzi: '集合', pinyin: 'jí hé', arti: 'berkumpul' },
+        { hanzi: '及时', pinyin: 'jí shí', arti: 'tepat waktu, sigap' },
+        { hanzi: '寄', pinyin: 'jì', arti: 'mengirim (pos)' },
+        { hanzi: '记者', pinyin: 'jì zhě', arti: 'wartawan, jurnalis' },
+        { hanzi: '技术', pinyin: 'jì shù', arti: 'teknologi, teknik' },
+        { hanzi: '既', pinyin: 'jì', arti: 'baik... maupun...' },
+        { hanzi: '继续', pinyin: 'jì xù', arti: 'melanjutkan' },
+        { hanzi: '家', pinyin: 'jiā', arti: 'rumah/keluarga' },
+        { hanzi: '家具', pinyin: 'jiā jù', arti: 'perabot rumah' },
+        { hanzi: '加班', pinyin: 'jiā bān', arti: 'lembur kerja' },
+        { hanzi: '加油', pinyin: 'jiā yóu', arti: 'semangat!' },
+        { hanzi: '假', pinyin: 'jiǎ', arti: 'palsu / cuti' },
+        { hanzi: '价格', pinyin: 'jià gé', arti: 'harga' },
+        { hanzi: '坚持', pinyin: 'jiān chí', arti: 'bertahan, konsisten' },
+        { hanzi: '减肥', pinyin: 'jiǎn féi', arti: 'menurunkan berat badan' },
+        { hanzi: '简单', pinyin: 'jiǎn dān', arti: 'sederhana' },
+        { hanzi: '件', pinyin: 'jiàn', arti: 'satuan baju/urusan' },
+        { hanzi: '健康', pinyin: 'jiàn kāng', arti: 'sehat' },
+        { hanzi: '见面', pinyin: 'jiàn miàn', arti: 'bertemu' },
+        { hanzi: '将', pinyin: 'jiāng', arti: 'akan' },
+        { hanzi: '讲', pinyin: 'jiǎng', arti: 'bercerita / berbicara' },
+        { hanzi: '奖金', pinyin: 'jiǎng jīn', arti: 'bonus, premi' },
+        { hanzi: '降低', pinyin: 'jiàng dī', arti: 'menurunkan' },
+        { hanzi: '交', pinyin: 'jiāo', arti: 'menyerahkan / berteman' },
+        { hanzi: '交流', pinyin: 'jiāo liú', arti: 'berkomunikasi' },
+        { hanzi: '交通', pinyin: 'jiāo tōng', arti: 'lalu lintas' },
+        { hanzi: '郊区', pinyin: 'jiāo qū', arti: 'pinggiran kota' },
+        { hanzi: '骄傲', pinyin: 'jiāo ào', arti: 'sombong / bangga' },
+        { hanzi: '饺子', pinyin: 'jiǎozi', arti: 'pangsit / kuotie' },
+        { hanzi: '教授', pinyin: 'jiào shòu', arti: 'profesor' },
+        { hanzi: '教育', pinyin: 'jiào yù', arti: 'pendidikan' },
+        { hanzi: '接受', pinyin: 'jiē shòu', arti: 'menerima' },
+        { hanzi: '节', pinyin: 'jié', arti: 'festival / bagian' },
+        { hanzi: '结果', pinyin: 'jié guǒ', arti: 'hasil' },
+        { hanzi: '解释', pinyin: 'jiě shì', arti: 'menjelaskan' },
+        { hanzi: '尽管', pinyin: 'jǐn guǎn', arti: 'meskipun' },
+        { hanzi: '紧张', pinyin: 'jǐn zhāng', arti: 'tegang / gugup' },
+        { hanzi: '进行', pinyin: 'jìn xíng', arti: 'melaksanakan' },
+        { hanzi: '禁止', pinyin: 'jìn zhǐ', arti: 'melarang' },
+        { hanzi: '精彩', pinyin: 'jīng cǎi', arti: 'menarik, seru' },
+        { hanzi: '精神', pinyin: 'jīng shén', arti: 'semangat / energi' },
+        { hanzi: '经常', pinyin: 'jīngcháng', arti: 'sering' },
+        { hanzi: '经过', pinyin: 'jīng guò', arti: 'melewati' },
+        { hanzi: '经济', pinyin: 'jīng jì', arti: 'ekonomi' },
+        { hanzi: '经理', pinyin: 'jīng lǐ', arti: 'manajer' },
+        { hanzi: '久', pinyin: 'jiǔ', arti: 'lama (waktu)' },
+        { hanzi: '旧', pinyin: 'jiù', arti: 'lama/kuno' },
+        { hanzi: '举行', pinyin: 'jǔ xíng', arti: 'mengadakan' },
+        { hanzi: '决定', pinyin: 'jué dìng', arti: 'memutuskan' },
+        { hanzi: '觉', pinyin: 'jué', arti: 'merasa' },
+        { hanzi: '渴', pinyin: 'kě', arti: 'haus' },
+        { hanzi: '可爱', pinyin: 'kě ài', arti: 'imut, lucu' },
+        { hanzi: '客人', pinyin: 'kèrén', arti: 'tamu' },
+        { hanzi: '肯定', pinyin: 'kěn dìng', arti: 'pasti' },
+        { hanzi: '空气', pinyin: 'kōng qì', arti: 'udara' },
+        { hanzi: '苦', pinyin: 'kǔ', arti: 'pahit' },
+        { hanzi: '快', pinyin: 'kuài', arti: 'cepat' },
+        { hanzi: '快乐', pinyin: 'kuài lè', arti: 'senang' },
+        { hanzi: '筷子', pinyin: 'kuàizi', arti: 'sumpit' },
+        { hanzi: '困', pinyin: 'kùn', arti: 'mengantuk / terjebak' },
+        { hanzi: '困难', pinyin: 'kùn nan', arti: 'kesulitan' },
+        { hanzi: '拉', pinyin: 'lā', arti: 'menarik' },
+        { hanzi: '垃圾桶', pinyin: 'lājītǒng', arti: 'tempat sampah' },
+        { hanzi: '来', pinyin: 'lái', arti: 'datang' },
+        { hanzi: '蓝', pinyin: 'lán', arti: 'biru' },
+        { hanzi: '懒', pinyin: 'lǎn', arti: 'malas' },
+        { hanzi: '累', pinyin: 'lèi', arti: 'lelah' },
+        { hanzi: '离开', pinyin: 'lí kāi', arti: 'meninggalkan' },
+        { hanzi: '礼貌', pinyin: 'lǐ mào', arti: 'sopan santun' },
+        { hanzi: '礼物', pinyin: 'lǐ wù', arti: 'hadiah' },
+        { hanzi: '理发', pinyin: 'lǐ fà', arti: 'potong rambut' },
+        { hanzi: '理解', pinyin: 'lǐ jiě', arti: 'memahami' },
+        { hanzi: '理想', pinyin: 'lǐ xiǎng', arti: 'cita-cita / ideal' },
+        { hanzi: '厉害', pinyin: 'lìhai', arti: 'hebat / parah' },
+        { hanzi: '力气', pinyin: 'lì qi', arti: 'tenaga' },
+        { hanzi: '例如', pinyin: 'lì rú', arti: 'contohnya' },
+        { hanzi: '俩', pinyin: 'liǎ', arti: 'mereka berdua' },
+        { hanzi: '连', pinyin: 'lián', arti: 'bahkan' },
+        { hanzi: '联系', pinyin: 'lián xì', arti: 'menghubungi' },
+        { hanzi: '凉快', pinyin: 'liángkuai', arti: 'sejuk' },
+        { hanzi: '零', pinyin: 'líng', arti: 'nol' },
+        { hanzi: '另外', pinyin: 'lìng wài', arti: 'selain itu' },
+        { hanzi: '留', pinyin: 'liú', arti: 'tinggal / menyisakan' },
+        { hanzi: '留学', pinyin: 'liú xué', arti: 'bersekolah di luar negeri' },
+        { hanzi: '流泪', pinyin: 'liú lèi', arti: 'meneteskan air mata' },
+        { hanzi: '流利', pinyin: 'liú lì', arti: 'lancar (bahasa)' },
+        { hanzi: '流行', pinyin: 'liú xíng', arti: 'populer' },
+        { hanzi: '路', pinyin: 'lù', arti: 'jalan' },
+        { hanzi: '旅游', pinyin: 'lǚ yóu', arti: 'pariwisata' },
+        { hanzi: '绿', pinyin: 'lǜ', arti: 'hijau' },
+        { hanzi: '律师', pinyin: 'lǜ shī', arti: 'pengacara' },
+        { hanzi: '麻烦', pinyin: 'máfan', arti: 'repot / merepotkan' },
+        { hanzi: '马', pinyin: 'mǎ', arti: 'kuda' },
+        { hanzi: '马虎', pinyin: 'mǎhu', arti: 'ceroboh' },
+        { hanzi: '满', pinyin: 'mǎn', arti: 'penuh' },
+        { hanzi: '毛巾', pinyin: 'máo jīn', arti: 'handuk' },
+        { hanzi: '美丽', pinyin: 'měi lì', arti: 'cantik' },
+        { hanzi: '梦', pinyin: 'mèng', arti: 'mimpi' },
+        { hanzi: '密码', pinyin: 'mì mǎ', arti: 'kata sandi / password' },
+        { hanzi: '免费', pinyin: 'miǎn fèi', arti: 'gratis' },
+        { hanzi: '民族', pinyin: 'mín zú', arti: 'suku bangsa' },
+        { hanzi: '母亲', pinyin: 'mǔ qīn', arti: 'ibu' },
+        { hanzi: '耐心', pinyin: 'nài xīn', arti: 'sabar' },
+        { hanzi: '难', pinyin: 'nán', arti: 'sulit' },
+        { hanzi: '难受', pinyin: 'nán shòu', arti: 'tidak enak badan' },
+        { hanzi: '内', pinyin: 'nèi', arti: 'dalam' },
+        { hanzi: '内容', pinyin: 'nèi róng', arti: 'isi / konten' },
+        { hanzi: '能力', pinyin: 'néng lì', arti: 'kemampuan' },
+        { hanzi: '年龄', pinyin: 'nián líng', arti: 'usia / umur' },
+        { hanzi: '弄', pinyin: 'nòng', arti: 'mengerjakan / membuat' },
+        { hanzi: '暖和', pinyin: 'nuǎnhuo', arti: 'hangat' },
+        { hanzi: '偶尔', pinyin: 'ǒu ěr', arti: 'kadang-kadang' },
+        { hanzi: '排队', pinyin: 'pái duì', arti: 'antre' },
+        { hanzi: '排列', pinyin: 'pái liè', arti: 'menyusun' },
+        { hanzi: '判断', pinyin: 'pàn duàn', arti: 'menilai / keputusan' },
+        { hanzi: '陪', pinyin: 'péi', arti: 'menemani' },
+        { hanzi: '批评', pinyin: 'pī píng', arti: 'mengkritik' },
+        { hanzi: '篇', pinyin: 'piān', arti: 'satuan artikel' },
+        { hanzi: '便宜', pinyin: 'piányi', arti: 'murah' },
+        { hanzi: '骗', pinyin: 'piàn', arti: 'menipu' },
+        { hanzi: '乒乓球', pinyin: 'pīngpāngqiú', arti: 'tenis meja' },
+        { hanzi: '平时', pinyin: 'píng shí', arti: 'biasanya / sehari-hari' },
+        { hanzi: '瓶子', pinyin: 'píngzi', arti: 'botol' },
+        { hanzi: '破', pinyin: 'pò', arti: 'pecah / rusak' },
+        { hanzi: '普遍', pinyin: 'pǔ biàn', arti: 'umum / universal' },
+        { hanzi: '葡萄', pinyin: 'pútao', arti: 'anggur' },
+        { hanzi: '其中', pinyin: 'qí zhōng', arti: 'di antaranya' },
+        { hanzi: '起来', pinyin: 'qǐ lái', arti: 'bangkit / mulai' },
+        { hanzi: '请假', pinyin: 'qǐng jià', arti: 'izin tidak masuk' },
+        { hanzi: '器官', pinyin: 'qì guān', arti: 'organ tubuh' },
+        { hanzi: '气氛', pinyin: 'qì fēn', arti: 'atmosfer / suasana' },
+        { hanzi: '情况', pinyin: 'qíng kuàng', arti: 'situasi / kondisi' },
+        { hanzi: '请客', pinyin: 'qǐng kè', arti: 'traktir / menjamu' },
+        { hanzi: '穷', pinyin: 'qióng', arti: 'miskin' },
+        { hanzi: '区别', pinyin: 'qū bié', arti: 'perbedaan' },
+        { hanzi: '取', pinyin: 'qǔ', arti: 'mengambil' },
+        { hanzi: '全部', pinyin: 'quán bù', arti: 'seluruhnya' },
+        { hanzi: '缺点', pinyin: 'quē diǎn', arti: 'kekurangan' },
+        { hanzi: '缺少', pinyin: 'quē shǎo', arti: 'kurang' },
+        { hanzi: '却', pinyin: 'què', arti: 'tetapi / justru' },
+        { hanzi: '确实', pinyin: 'què shí', arti: 'memang benar' },
+        { hanzi: '群', pinyin: 'qún', arti: 'kawanan / kelompok' },
+        { hanzi: '然', pinyin: 'rán', arti: 'demikian' },
+        { hanzi: '然后', pinyin: 'rán hòu', arti: 'kemudian' },
+        { hanzi: '热闹', pinyin: 'rènao', arti: 'ramai' },
+        { hanzi: '人民币', pinyin: 'rén mín bì', arti: 'mata uang RMB' },
+        { hanzi: '任何', pinyin: 'rèn hé', arti: 'apa pun / apa saja' },
+        { hanzi: '任务', pinyin: 'rèn wu', arti: 'tugas' },
+        { hanzi: '热情', pinyin: 'rè qíng', arti: 'antusias / ramah' },
+        { hanzi: '容纳', pinyin: 'róng nà', arti: 'menampung' },
+        { hanzi: '容易', pinyin: 'róngyì', arti: 'mudah' },
+        { hanzi: '如果', pinyin: 'rú guǒ', arti: 'jika' },
+        { hanzi: '入口', pinyin: 'rù kǒu', arti: 'pintu masuk' },
+        { hanzi: '商量', pinyin: 'shāngliang', arti: 'berunding / berdiskusi' },
+        { hanzi: '稍微', pinyin: 'shāo wēi', arti: 'sedikit / agak' },
+        { hanzi: '社会', pinyin: 'shè huì', arti: 'masyarakat' },
+        { hanzi: '申请', pinyin: 'shēn qǐng', arti: 'mengajukan' },
+        { hanzi: '深', pinyin: 'shēn', arti: 'dalam (warna/kedalaman)' },
+        { hanzi: '甚至', pinyin: 'shèn zhì', arti: 'bahkan' },
+        { hanzi: '生活', pinyin: 'shēng huó', arti: 'kehidupan' },
+        { hanzi: '生命', pinyin: 'shēng mìng', arti: 'nyawa / kehidupan' },
+        { hanzi: '省', pinyin: 'shěng', arti: 'provinsi / menghemat' },
+        { hanzi: '身高', pinyin: 'shēn gāo', arti: 'tinggi badan' },
+        { hanzi: '剩下', pinyin: 'shèng xià', arti: 'tersisa' },
+        { hanzi: '失败', pinyin: 'shī bài', arti: 'gagal' },
+        { hanzi: '失望', pinyin: 'shī wàng', arti: 'kecewa' },
+        { hanzi: '师傅', pinyin: 'shīfu', arti: 'sufi / pak sopir / master' },
+        { hanzi: '十分', pinyin: 'shí fēn', arti: 'sangat sepuluh persen (sangat)' },
+        { hanzi: '实际', pinyin: 'shí jì', arti: 'aktual / kenyataan' },
+        { hanzi: '实在', pinyin: 'shí zài', arti: 'sungguh / jujur' },
+        { hanzi: '使用', pinyin: 'shǐ yòng', arti: 'menggunakan' },
+        { hanzi: '市区', pinyin: 'shì qū', arti: 'pusat kota' },
+        { hanzi: '适应', pinyin: 'shì yìng', arti: 'beradaptasi' },
+        { hanzi: '收到', pinyin: 'shōu dào', arti: 'menerima' },
+        { hanzi: '受到', pinyin: 'shòu dào', arti: 'menerima (pengaruh)' },
+        { hanzi: '售货员', pinyin: 'shòuhuòyuán', arti: 'pramuniaga' },
+        { hanzi: '输', pinyin: 'shū', arti: 'kalah' },
+        { hanzi: '熟悉', pinyin: 'shú xī', arti: 'akrab / mengenal dengan baik' },
+        { hanzi: '数量', pinyin: 'shù liàng', arti: 'jumlah / kuantitas' },
+        { hanzi: '数字', pinyin: 'shù zì', arti: 'angka' },
+        { hanzi: '帅', pinyin: 'shuài', arti: 'ganteng' },
+        { hanzi: '顺便', pinyin: 'shùn biàn', arti: 'sekalian' },
+        { hanzi: '顺利', pinyin: 'shùn lì', arti: 'lancar / sukses' },
+        { hanzi: '说话', pinyin: 'shuō huà', arti: 'berbicara' },
+        { hanzi: '说明', pinyin: 'shuō míng', arti: 'menjelaskan / keterangan' },
+        { hanzi: '死', pinyin: 'sǐ', arti: 'mati' },
+        { hanzi: '速度', pinyin: 'sù dù', arti: 'kecepatan' },
+        { hanzi: '塑料袋', pinyin: 'sùliàodài', arti: 'kantong plastik' },
+        { hanzi: '酸', pinyin: 'suān', arti: 'asam' },
+        { hanzi: '随便', pinyin: 'suí biàn', arti: 'bebas / terserah' },
+        { hanzi: '随着', pinyin: 'suí zhe', arti: 'seiring dengan' },
+        { hanzi: '孙子', pinyin: 'sūnzi', arti: 'cucu laki-laki' },
+        { hanzi: '所有', pinyin: 'suǒ yǒu', arti: 'semua' },
+        { hanzi: '台', pinyin: 'tái', arti: 'satuan alat elektronik' },
+        { hanzi: '抬', pinyin: 'tái', arti: 'mengangkat' },
+        { hanzi: '态度', pinyin: 'tài du', arti: 'sikap' },
+        { hanzi: '谈', pinyin: 'tán', arti: 'membahas / mengobrol' },
+        { hanzi: '弹', pinyin: 'tán', arti: 'memetik (alat musik)' },
+        { hanzi: '汤', pinyin: 'tāng', arti: 'sup' },
+        { hanzi: '趟', pinyin: 'tàng', arti: 'satuan perjalanan' },
+        { hanzi: '特色', pinyin: 'tè sè', arti: 'ciri khas' },
+        { hanzi: '提前', pinyin: 'tí qián', arti: 'lebih awal / memajukan waktu' },
+        { hanzi: '提醒', pinyin: 'tí xǐng', arti: 'mengingatkan' },
+        { hanzi: '填空', pinyin: 'tián kòng', arti: 'mengisi bagian kosong' },
+        { hanzi: '条件', pinyin: 'tiáo jiàn', arti: 'syarat / kondisi' },
+        { hanzi: '停止', pinyin: 'tíng zhǐ', arti: 'berhenti' },
+        { hanzi: '挺', pinyin: 'tǐng', arti: 'cukup' },
+        { hanzi: '通过', pinyin: 'tōng guò', arti: 'melalui' },
+        { hanzi: '通知', pinyin: 'tōng zhī', arti: 'pemberitahuan / mengabari' },
+        { hanzi: '同情', pinyin: 'tóng qíng', arti: 'simpati / kasihan' },
+        { hanzi: '推', pinyin: 'tuī', arti: 'mendorong' },
+        { hanzi: '推迟', pinyin: 'tuī chí', arti: 'menunda' },
+        { hanzi: '脱', pinyin: 'tuō', arti: 'melepas (pakaian)' },
+        { hanzi: '袜子', pinyin: 'wàzi', arti: 'kaus kaki' },
+        { hanzi: '完全', pinyin: 'wán quán', arti: 'sepenuhnya' },
+        { hanzi: '网球', pinyin: 'wǎng qiú', arti: 'tenis' },
+        { hanzi: '网站', pinyin: 'wǎng zhàn', arti: 'situs web' },
+        { hanzi: '往往', pinyin: 'wǎng wǎng', arti: 'sering kali' },
+        { hanzi: '危险', pinyin: 'wēi xiǎn', arti: 'berbahaya' },
+        { hanzi: '味道', pinyin: 'wèi dào', arti: 'rasa / bau' },
+        { hanzi: '温度', pinyin: 'wēn dù', arti: 'suhu' },
+        { hanzi: '文章', pinyin: 'wén zhāng', arti: 'artikel / tulisan' },
+        { hanzi: '污染', pinyin: 'wū rǎn', arti: 'polusi' },
+        { hanzi: '无', pinyin: 'wú', arti: 'tidak ada' },
+        { hanzi: '无聊', pinyin: 'wú liáo', arti: 'bosan' },
+        { hanzi: '无论', pinyin: 'wú lùn', arti: 'tidak peduli / bagaimanapun' },
+        { hanzi: '误会', pinyin: 'wù huì', arti: 'salah paham' },
+        { hanzi: '吸引', pinyin: 'xī yǐn', arti: 'menarik (perhatian)' },
+        { hanzi: '咸', pinyin: 'xián', arti: 'asin' },
+        { hanzi: '显示', pinyin: 'xiǎn shì', arti: 'menampilkan' },
+        { hanzi: '羡慕', pinyin: 'xiàn mù', arti: 'iri / mengagumi' },
+        { hanzi: '相框', pinyin: 'xiāng kuàng', arti: 'bingkai foto' },
+        { hanzi: '相反', pinyin: 'xiāng fǎn', arti: 'sebaliknya' },
+        { hanzi: '相同', pinyin: 'xiāng tóng', arti: 'sama / serupa' },
+        { hanzi: '详细', pinyin: 'xiáng xì', arti: 'terperinci' },
+        { hanzi: '响', pinyin: 'xiǎng', arti: 'berdering / bersuara' },
+        { hanzi: '橡皮', pinyin: 'xiàngpí', arti: 'penghapus' },
+        { hanzi: '消息', pinyin: 'xiāo xi', arti: 'kabar / berita' },
+        { hanzi: '小说', pinyin: 'xiǎo shuō', arti: 'novel' },
+        { hanzi: '辛苦', pinyin: 'xīn kǔ', arti: 'susah / kerja keras' },
+        { hanzi: '心情', pinyin: 'xīn qíng', arti: 'suasana hati (mood)' },
+        { hanzi: '信任', pinyin: 'xìn rèn', arti: 'mempercayai' },
+        { hanzi: '兴奋', pinyin: 'xīng fèn', arti: 'bersemangat / antusias' },
+        { hanzi: '行', pinyin: 'xíng', arti: 'boleh / oke' },
+        { hanzi: '醒', pinyin: 'xǐng', arti: 'bangun tidur' },
+        { hanzi: '性别', pinyin: 'xìng bié', arti: 'jenis kelamin' },
+        { hanzi: '性格', pinyin: 'xìng gé', arti: 'kepribadian / sifat' },
+        { hanzi: '幸福', pinyin: 'xìng fú', arti: 'bahagia' },
+        { hanzi: '修', pinyin: 'xiū', arti: 'memperbaiki' },
+        { hanzi: '许多', pinyin: 'xǔ duō', arti: 'banyak' },
+        { hanzi: '压力', pinyin: 'yā lì', arti: 'tekanan / stres' },
+        { hanzi: '牙膏', pinyin: 'yá gāo', arti: 'pasta gigi' },
+        { hanzi: '亚洲', pinyin: 'Yàzhōu', arti: 'Asia' },
+        { hanzi: '呀', pinyin: 'ya', arti: 'partikel seru' },
+        { hanzi: '盐', pinyin: 'yán', arti: 'garam' },
+        { hanzi: '严格', pinyin: 'yán gé', arti: 'ketat / disiplin' },
+        { hanzi: '严重', pinyin: 'yán zhòng', arti: 'parah / serius' },
+        { hanzi: '演员', pinyin: 'yǎn yuán', arti: 'aktor / aktris' },
+        { hanzi: '阳光', pinyin: 'yáng guāng', arti: 'sinar matahari' },
+        { hanzi: '养成', pinyin: 'yǎng chéng', arti: 'membentuk (kebiasaan)' },
+        { hanzi: '样子', pinyin: 'yàngzi', arti: 'penampilan / bentuk' },
+        { hanzi: '邀请', pinyin: 'yāo qǐng', arti: 'mengundang' },
+        { hanzi: '钥匙', pinyin: 'yàoshi', arti: 'kunci' },
+        { hanzi: '也许', pinyin: 'yě xǔ', arti: 'mungkin' },
+        { hanzi: '叶子', pinyin: 'yèzi', arti: 'daun' },
+        { hanzi: '页', pinyin: 'yè', arti: 'halaman' },
+        { hanzi: '一切', pinyin: 'yí qiè', arti: 'segala sesuatu' },
+        { hanzi: '以', pinyin: 'yǐ', arti: 'dengan' },
+        { hanzi: '亿', pinyin: 'yì', arti: 'ratus juta' },
+        { hanzi: '意见', pinyin: 'yì jiàn', arti: 'pendapat' },
+        { hanzi: '艺术', pinyin: 'yì shù', arti: 'seni' },
+        { hanzi: '因此', pinyin: 'yīn cǐ', arti: 'oleh karena itu' },
+        { hanzi: '引起', pinyin: 'yǐn qǐ', arti: 'memicu / menimbulkan' },
+        { hanzi: '印象', pinyin: 'yìn xiàng', arti: 'kesan' },
+        { hanzi: '赢', pinyin: 'yíng', arti: 'menang' },
+        { hanzi: '应聘', pinyin: 'yìng pìn', arti: 'melamar pekerjaan' },
+        { hanzi: '勇敢', pinyin: 'yǒng gǎn', arti: 'berani' },
+        { hanzi: '永远', pinyin: 'yǒng yuǎn', arti: 'selamanya' },
+        { hanzi: '优点', pinyin: 'yōu diǎn', arti: 'kelebihan' },
+        { hanzi: '优秀', pinyin: 'yōu xiù', arti: 'unggul / berprestasi' },
+        { hanzi: '幽默', pinyin: 'yōu mò', arti: 'humoris' },
+        { hanzi: '由', pinyin: 'yóu', arti: 'oleh / dari' },
+        { hanzi: '由于', pinyin: 'yóu yú', arti: 'karena' },
+        { hanzi: '邮局', pinyin: 'yóu jú', arti: 'kantor pos' },
+        { hanzi: '友好', pinyin: 'yǒu hǎo', arti: 'ramah' },
+        { hanzi: '有趣', pinyin: 'yǒu qù', arti: 'menarik' },
+        { hanzi: '举办', pinyin: 'jǔ bàn', arti: 'menyelenggarakan' },
+        { hanzi: '语法', pinyin: 'yǔ fǎ', arti: 'tata bahasa' },
+        { hanzi: '羽毛球', pinyin: 'yǔmáoqiú', arti: 'bulu tangkis' },
+        { hanzi: '语言', pinyin: 'yǔ yán', arti: 'bahasa' },
+        { hanzi: '预习', pinyin: 'yù xí', arti: 'prastudi / belajar mandiri' },
+        { hanzi: '圆', pinyin: 'yuán', arti: 'bulat' },
+        { hanzi: '原谅', pinyin: 'yuán liàng', arti: 'memaafkan' },
+        { hanzi: '原因', pinyin: 'yuán yīn', arti: 'alasan' },
+        { hanzi: '约会', pinyin: 'yuē huì', arti: 'berkencan' },
+        { hanzi: '阅读', pinyin: 'yuè dú', arti: 'membaca' },
+        { hanzi: '允许', pinyin: 'yǔn xǔ', arti: 'mengizinkan' },
+        { hanzi: '咱们', pinyin: 'zánmen', arti: 'kita' },
+        { hanzi: '暂时', pinyin: 'zàn shí', arti: 'sementara' },
+        { hanzi: '脏', pinyin: 'zāng', arti: 'kotor' },
+        { hanzi: '责任', pinyin: 'zé rèn', arti: 'tanggung jawab' },
+        { hanzi: '增加', pinyin: 'zēng jiā', arti: 'menambah' },
+        { hanzi: '占线', pinyin: 'zhàn xiàn', arti: 'saluran telepon sibuk' },
+        { hanzi: '招聘', pinyin: 'zhāo pìn', arti: 'perekrutan / lowongan' },
+        { hanzi: '哲学', pinyin: 'zhé xué', arti: 'filsafat' },
+        { hanzi: '真正', pinyin: 'zhēn zhèng', arti: 'sejati / benar-benar' },
+        { hanzi: '整理', pinyin: 'zhěng lǐ', arti: 'merapikan' },
+        { hanzi: '正常', pinyin: 'zhèng cháng', arti: 'normal' },
+        { hanzi: '正好', pinyin: 'zhèng hǎo', arti: 'kebetulan pas' },
+        { hanzi: '正确', pinyin: 'zhèng què', arti: 'benar' },
+        { hanzi: '正式', pinyin: 'zhèng shì', arti: 'resmi' },
+        { hanzi: '证明', pinyin: 'zhèng míng', arti: 'membuktikan / surat keterangan' },
+        { hanzi: '之', pinyin: 'zhī', arti: 'kata sambuk kepemilikan' },
+        { hanzi: '支持', pinyin: 'zhī chí', arti: 'mendukung' },
+        { hanzi: '知识', pinyin: 'zhī shi', arti: 'pengetahuan' },
+        { hanzi: '值得', pinyin: 'zhí de', arti: 'pantas / bernilai' },
+        { hanzi: '植物', pinyin: 'zhí wù', arti: 'tumbuhan' },
+        { hanzi: '职业', pinyin: 'zhí yè', arti: 'profesi' },
+        { hanzi: '只好', pinyin: 'zhǐ hǎo', arti: 'terpaksa' },
+        { hanzi: '只要', pinyin: 'zhǐ yào', arti: 'asal(kan)' },
+        { hanzi: '质量', pinyin: 'zhì liàng', arti: 'kualitas' },
+        { hanzi: '中国', pinyin: 'Zhōngguó', arti: 'China' },
+        { hanzi: '重点', pinyin: 'zhòng diǎn', arti: 'titik fokus / prioritas' },
+        { hanzi: '重点', pinyin: 'zhòng diǎn', arti: 'fokus utama' },
+        { hanzi: '重视', pinyin: 'zhòng shì', arti: 'mementingkan / menghargai' },
+        { hanzi: '周围', pinyin: 'zhōu wéi', arti: 'sekitar' },
+        { hanzi: '主意', pinyin: 'zhǔ yi', arti: 'ide / gagasan' },
+        { hanzi: '祝贺', pinyin: 'zhù hè', arti: 'selamat / merayakan' },
+        { hanzi: '著名', pinyin: 'zhù míng', arti: 'terkenal' },
+        { hanzi: '专门', pinyin: 'zhuān mén', arti: 'khusus' },
+        { hanzi: '专业', pinyin: 'zhuān yè', arti: 'jurusan / profesional' },
+        { hanzi: '赚', pinyin: 'zhuàn', arti: 'mendapat untung' },
+        { hanzi: '撞', pinyin: 'zhuàng', arti: 'menabrak' },
+        { hanzi: '准确', pinyin: 'zhǔn què', arti: 'akurat' },
+        { hanzi: '准时', pinyin: 'zhǔn shí', arti: 'tepat waktu' },
+        { hanzi: '桌子', pinyin: 'zhuōzi', arti: 'meja' },
+        { hanzi: '子', pinyin: 'zǐ', arti: 'anak / akhiran kata' },
+        { hanzi: '资格', pinyin: 'zī gé', arti: 'kualifikasi' },
+        { hanzi: '资源', pinyin: 'zī yuán', arti: 'sumber daya' },
+        { hanzi: '紫', pinyin: 'zǐ', arti: 'ungu' },
+        { hanzi: '自愿', pinyin: 'zì yuàn', arti: 'sukarela' },
+        { hanzi: '总结', pinyin: 'zǒng jié', arti: 'kesimpulan / merangkum' },
+        { hanzi: '租', pinyin: 'zū', arti: 'menyewa' },
+        { hanzi: '组成', pinyin: 'zǔ chéng', arti: 'terdiri dari / membentuk' },
+        { hanzi: '组织', pinyin: 'zǔ zhī', arti: 'organisasi' },
+        { hanzi: '嘴', pinyin: 'zuǐ', arti: 'mulut' },
+        { hanzi: '最好', pinyin: 'zuì hǎo', arti: 'sebaiknya' },
+        { hanzi: '最后', pinyin: 'zuì hòu', arti: 'terakhir' },
+        { hanzi: '尊重', pinyin: 'zūn zhòng', arti: 'menghormati' },
+        { hanzi: '做', pinyin: 'zuò', arti: 'melakukan' },
+        { hanzi: '做法', pinyin: 'zuò fǎ', arti: 'cara pembuatan / tindakan' },
+        { hanzi: '作息', pinyin: 'zuò xī', arti: 'jadwal kegiatan harian' }
+      ]
+    };
+
+    let activeMenu = 'kamus';
+    let currentHSK = 'SEMUA'; 
+    let searchQuery = '';
+    let currentItem = null;
+    let modalWriters = [];
+    let practiceWriters = [];
+    let canvasContexts = [];
+
+    // Variabel state tambahan untuk modul baru
+    let flashcardIndex = 0;
+    let flashcardFlipped = false;
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+
+    const quizData = [
+      {
+        question: "Apa arti dari kosakata HSK 1 '爱' (ài)?",
+        options: ["Suka, mencintai", "Makan", "Minum", "Pergi"],
+        answer: 0
+      },
+      {
+        question: "Bagaimana Pinyin dari kata '老师' (Guru)?",
+        options: ["lǎoshī", "xuésheng", "péngyou", "māma"],
+        answer: 0
+      },
+      {
+        question: "Manakah kosakata HSK 2 yang berarti 'Buku/Koran'?",
+        options: ["报纸 (bàozhǐ)", "苹果 (píngguǒ)", "水 (shuǐ)", "猫 (māo)"],
+        answer: 0
+      }
+    ];
+
+    function switchMenu(menu, el) {
+      document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+      el.classList.add('active');
+      activeMenu = menu;
+      renderPage();
+    }
+
+    function renderHSKTabs() {
+      const levels = ['SEMUA', 'HSK 1', 'HSK 2', 'HSK 3', 'HSK 4'];
+      return `<div class="hsk-tabs">
+        ${levels.map(lvl => `<button class="tab-btn ${currentHSK === lvl ? 'active' : ''}" onclick="changeHSK('${lvl}')">${lvl}</button>`).join('')}
+      </div>`;
+    }
+
+    function changeHSK(lvl) {
+      currentHSK = lvl;
+      renderPage();
+    }
+
+    function handleSearch(query) {
+      searchQuery = query.toLowerCase().trim();
+      renderVocabGrid();
+    }
+
+    function getAllVocab() {
+      let list = [];
+      Object.keys(databaseHSK).forEach(lvl => {
+        databaseHSK[lvl].forEach(item => {
+          list.push({ ...item, level: lvl });
+        });
+      });
+      return list;
+    }
+
+    function renderVocabGrid() {
+      const gridContainer = document.getElementById('vocabGridContainer');
+      if (!gridContainer) return;
+
+      let list = [];
+      if (currentHSK === 'SEMUA') {
+        list = getAllVocab();
+      } else {
+        list = (databaseHSK[currentHSK] || []).map(item => ({ ...item, level: currentHSK }));
+      }
+
+      const filtered = list.filter(item => 
+        item.hanzi.includes(searchQuery) ||
+        item.pinyin.toLowerCase().includes(searchQuery) ||
+        item.arti.toLowerCase().includes(searchQuery)
+      );
+
+      if (filtered.length === 0) {
+        gridContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">Kosakata tidak ditemukan.</div>`;
+        return;
+      }
+
+      gridContainer.innerHTML = filtered.map(item => `
+        <div class="vocab-card" onclick="openModal('${item.hanzi}', '${item.pinyin}', '${item.arti}')">
+          ${currentHSK === 'SEMUA' ? `<span class="card-level">${item.level}</span>` : ''}
+          <div class="card-hanzi">${item.hanzi}</div>
+          <div class="card-pinyin">${item.pinyin}</div>
+          <div class="card-arti">${item.arti}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderPage() {
+      const area = document.getElementById('contentArea');
+      const title = document.getElementById('pageTitle');
+      const desc = document.getElementById('pageDesc');
+
+      if (activeMenu === 'kamus') {
+        title.innerHTML = "📖 Kamus HSK 1–4";
+        desc.innerText = "Daftar kosakata resmi HSK 1 sampai HSK 4 dengan audio pengucapan interaktif & latihan tulis.[cite: 3]";
+        
+        area.innerHTML = `
+          <div class="controls-wrapper">
+            <div class="search-box">
+              <input type="text" class="search-input" placeholder="🔍 Cari Hanzi, Pinyin, atau Arti..." value="${searchQuery}" oninput="handleSearch(this.value)">
+            </div>
+            ${renderHSKTabs()}
+          </div>
+          <div class="vocab-grid" id="vocabGridContainer"></div>
+        `;
+        renderVocabGrid();
+
+      } else if (activeMenu === 'hanzi') {
+        title.innerHTML = "✍ Menulis Hanzi";
+        desc.innerText = "Pilih kosakata. Sistem akan langsung menyediakan kotak animasi dan kanvas latihan untuk setiap karakter Hanzi.";
+
+        let allVocab = getAllVocab();
+
+        area.innerHTML = `
+          <div style="text-align: center; margin-bottom: 20px;">
+            <label style="color: var(--text-muted); display: block; margin-bottom: 8px;">Pilih Kosakata Kamus untuk Dilatih:</label>
+            <select id="vocabSelect" class="select-dropdown" onchange="onSelectVocabToPractice(this.value)">
+              ${allVocab.map(v => `<option value="${v.hanzi}">[${v.level}]${v.hanzi} (${v.pinyin}) -${v.arti}</option>`).join('')}
+            </select>
+            <div>
+              <button class="btn-action" onclick="playAllAnimations()">▶ Putar Semua Animasi</button>
+              <button class="btn-action btn-secondary" onclick="playAudioText(document.getElementById('vocabSelect').value)">🔊 Suara</button>
+              <button class="btn-action btn-secondary" onclick="clearAllCanvases()">🗑️ Hapus Semua Kanvas</button>
+            </div>
+          </div>
+
+          <div id="multiWritingContainer"></div>
+        `;
+
+        setTimeout(() => {
+          const defaultItem = allVocab.find(v => v.hanzi === '爱情') || allVocab[0];
+          document.getElementById('vocabSelect').value = defaultItem.hanzi;
+          onSelectVocabToPractice(defaultItem.hanzi);
+        }, 50);
+
+      } else if (activeMenu === 'tugas') {
+        title.innerHTML = "📝 Tugas Interaktif";
+        desc.innerText = "Kerjakan latihan terpadu untuk menguji pemahaman kosakata dan tata bahasa Mandarin Anda.";
+        area.innerHTML = `
+          <div class="quiz-container">
+            <div class="quiz-question">Tugas 1: Terjemahkan kalimat berikut ke dalam bahasa Indonesia dengan benar.</div>
+            <p style="color: var(--gold-bright); font-size: 1.1rem; margin-bottom: 15px;">“我喜欢学汉语。” (Wǒ xǐhuan xué Hànyǔ.)</p>
+            <div class="quiz-options">
+              <button class="quiz-option-btn" onclick="checkTugas(this, false)">A. Saya suka minum teh.</button>
+              <button class="quiz-option-btn" onclick="checkTugas(this, true)">B. Saya suka belajar bahasa Mandarin.</button>
+              <button class="quiz-option-btn" onclick="checkTugas(this, false)">C. Saya pergi ke sekolah.</button>
+            </div>
+            <div id="tugasFeedback" style="margin-top: 15px; font-weight: 600;"></div>
+          </div>
+        `;
+
+      } else if (activeMenu === 'percakapan') {
+        title.innerHTML = "🎙️ Percakapan (对话)";
+        desc.innerText = "Simulasi percakapan sehari-hari dalam bahasa Mandarin lengkap dengan terjemahannya.";
+        area.innerHTML = `
+          <div class="chat-bubble-container">
+            <div class="chat-bubble">
+              <div class="chat-speaker">A: 老师 (Lǎoshī - Guru)</div>
+              <div class="chat-text-zh">你叫什么名字？(Nǐ jiào shénme míngzi?)</div>
+              <div class="chat-text-id">Siapa namamu?</div>
+            </div>
+            <div class="chat-bubble" style="background: #25070a;">
+              <div class="chat-speaker">B: 学生 (Xuésheng - Murid)</div>
+              <div class="chat-text-zh">我叫 PakBujan。(Wǒ jiào PakBujan.)</div>
+              <div class="chat-text-id">Nama saya PakBujan.</div>
+            </div>
+            <div class="chat-bubble">
+              <div class="chat-speaker">A: 老师 (Lǎoshī)</div>
+              <div class="chat-text-zh">很高兴认识你！(Hěn gāoxìng rènshi nǐ!)</div>
+              <div class="chat-text-id">Senang berkenalan denganmu!</div>
+            </div>
+            <div style="text-align: center; margin-top: 10px;">
+              <button class="btn-action" onclick="playAudioText('你叫什么名字？我叫 PakBujan。很高兴认识你！')">🔊 Dengar Percakapan</button>
+            </div>
+          </div>
+        `;
+
+      } else if (activeMenu === 'pola') {
+        title.innerHTML = "🔤 Pola Kalimat (句型)";
+        desc.innerText = "Pelajari struktur dasar kalimat bahasa Mandarin agar mudah merangkai kata.";
+        area.innerHTML = `
+          <div style="max-width: 650px; margin: 0 auto;">
+            <div class="pola-card">
+              <div class="pola-title">1. Subjek + 想 (xiǎng) + Kata Kerja</div>
+              <div class="pola-formula">S + 想 + Verb + (Objek)</div>
+              <div class="pola-example">Contoh: 我想吃米饭。(Wǒ xiǎng chī mǐfàn.)</div>
+              <div class="pola-arti">Artinya: Saya ingin makan nasi.</div>
+            </div>
+            <div class="pola-card">
+              <div class="pola-title">2. Subjek + 在 (zài) + Tempat + Kata Kerja</div>
+              <div class="pola-formula">S + 在 + Tempat + Verb</div>
+              <div class="pola-example">Contoh:他在学校学习。(Tā zài xuéxiào xuéxí.)</div>
+              <div class="pola-arti">Artinya: Dia sedang belajar di sekolah.</div>
+            </div>
+          </div>
+        `;
+
+      } else if (activeMenu === 'hapalan') {
+        title.innerHTML = "📇 Kartu Hapalan (Flashcards)";
+        desc.innerText = "Latih daya ingat kosakata Anda dengan kartu kilat interaktif.";
+        renderFlashcardContent();
+
+      } else if (activeMenu === 'tes') {
+        title.innerHTML = "🎯 Tes HSK";
+        desc.innerText = "Uji kemampuan Anda melalui kuis pilihan ganda HSK.";
+        renderQuizContent();
+
+      } else if (activeMenu === 'rapor') {
+        title.innerHTML = "📜 Rapor & Sertifikat";
+        desc.innerText = "Lihat pencapaian belajar dan sertifikat kelulusan Anda di PakBujan Academy.";
+        area.innerHTML = `
+          <div class="certificate-card">
+            <h3 style="color: var(--gold-bright); font-family: 'Cinzel', serif; font-size: 1.5rem; margin-bottom: 10px;">SERTIFIKAT PENGHARGAAN</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Diberikan dengan bangga kepada pembelajar aktif di</p>
+            <h2 style="color: var(--gold-primary); font-family: 'Cinzel', serif; font-size: 1.8rem; margin-bottom: 20px;">PAKBUJAN ACADEMY</h2>
+            <p style="color: var(--text-white); font-size: 1rem; margin-bottom: 15px;">Telah menyelesaikan modul dasar Kosakata HSK 1–4 & Latihan Menulis Hanzi.</p>
+            <div style="margin-top: 30px; display: flex; justify-content: space-around; color: var(--text-muted); font-size: 0.85rem;">
+              <div>Status: <b>Aktif & Tuntas</b></div>
+              <div>Platform: <b>Mandarin Learning Platform</b></div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    /* KONTROL FLASHCARD */
+    function renderFlashcardContent() {
+      const area = document.getElementById('contentArea');
+      const allVocab = getAllVocab();
+      const currentCard = allVocab[flashcardIndex];
+
+      area.innerHTML = `
+        <div class="flashcard-container">
+          <div class="flashcard ${flashcardFlipped ? 'flipped' : ''}" onclick="toggleFlashcard()">
+            <div class="flashcard-front">
+              <span style="font-size: 0.8rem; color: var(--gold-primary); position: absolute; top: 12px; left: 16px;">[${currentCard.level}] Kartu ${flashcardIndex + 1}/${allVocab.length}</span>
+              <div style="font-size: 3.5rem; font-weight: 700; color: var(--gold-primary); margin-bottom: 8px;">${currentCard.hanzi}</div>
+              <div style="font-size: 0.9rem; color: var(--text-muted);">Klik kartu untuk melihat arti & pinyin</div>
+            </div>
+            <div class="flashcard-back">
+              <div style="font-size: 1.5rem; color: var(--gold-bright); font-weight: 600; margin-bottom: 8px;">${currentCard.pinyin}</div>
+              <div style="font-size: 1.1rem; color: var(--text-white); margin-bottom: 12px;">${currentCard.arti}</div>
+              <button class="btn-action" onclick="event.stopPropagation(); playAudioText('${currentCard.hanzi}')">🔊 Dengar</button>
+            </div>
+          </div>
+          <div class="flashcard-controls">
+            <button class="btn-action btn-secondary" onclick="prevFlashcard()">⬅ Sebelumnya</button>
+            <button class="btn-action" onclick="nextFlashcard()">Selanjutnya ➡</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleFlashcard() {
+      flashcardFlipped = !flashcardFlipped;
+      renderFlashcardContent();
+    }
+
+    function nextFlashcard() {
+      flashcardFlipped = false;
+      const allVocab = getAllVocab();
+      flashcardIndex = (flashcardIndex + 1) % allVocab.length;
+      renderFlashcardContent();
+    }
+
+    function prevFlashcard() {
+      flashcardFlipped = false;
+      const allVocab = getAllVocab();
+      flashcardIndex = (flashcardIndex - 1 + allVocab.length) % allVocab.length;
+      renderFlashcardContent();
+    }
+
+    /* KONTROL KUIS / TES HSK */
+    function renderQuizContent() {
+      const area = document.getElementById('contentArea');
+      if (currentQuizIndex >= quizData.length) {
+        area.innerHTML = `
+          <div style="text-align: center; max-width: 500px; margin: 0 auto; padding: 30px;">
+            <h2 style="color: var(--gold-primary); margin-bottom: 12px;">Tes Selesai! 🎉</h2>
+            <p style="color: var(--text-white); font-size: 1.1rem; margin-bottom: 20px;">Skor Anda: <b>${quizScore} / ${quizData.length}</b></p>
+            <button class="btn-action" onclick="resetQuiz()">Ulangi Tes</button>
+          </div>
+        `;
+        return;
+      }
+
+      const q = quizData[currentQuizIndex];
+      area.innerHTML = `
+        <div class="quiz-container">
+          <div class="quiz-question">Soal ${currentQuizIndex + 1} dari ${quizData.length}: ${q.question}</div>
+          <div class="quiz-options">
+            ${q.options.map((opt, idx) => `
+              <button class="quiz-option-btn" onclick="answerQuiz(${idx})">${opt}</button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function answerQuiz(selectedIdx) {
+      const q = quizData[currentQuizIndex];
+      if (selectedIdx === q.answer) {
+        quizScore++;
+      }
+      currentQuizIndex++;
+      renderQuizContent();
+    }
+
+    function resetQuiz() {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      renderQuizContent();
+    }
+
+    function checkTugas(btn, isCorrect) {
+      const fb = document.getElementById('tugasFeedback');
+      if (isCorrect) {
+        btn.classList.add('correct');
+        fb.innerHTML = `<span style="color: #75b798;">Jawaban Anda benar! 🎉 Kalimat tersebut menyatakan "Saya suka belajar bahasa Mandarin."</span>`;
+      } else {
+        btn.classList.add('wrong');
+        fb.innerHTML = `<span style="color: #ea868f;">Jawaban kurang tepat. Silakan coba pilihan lainnya.</span>`;
+      }
+    }
+
+    /* POPUP MODAL KAMUS MULTI-HANZI */
+    function openModal(hanzi, pinyin, arti) {
+      currentItem = { hanzi, pinyin, arti };
+      document.getElementById('modalPinyin').innerText = pinyin;
+      document.getElementById('modalArti').innerText = arti;
+      
+      const container = document.getElementById('modalHanziContainer');
+      container.innerHTML = '';
+      modalWriters = [];
+
+      const chars = hanzi.replace(/[^\u4e00-\u9fa5]/g, '').split('');
+
+      chars.forEach((char, idx) => {
+        const box = document.createElement('div');
+        box.className = 'writing-box-single';
+        box.style.flex = '0 0 150px';
+        box.innerHTML = `
+          <div style="color: var(--gold-bright); font-size:0.8rem; margin-bottom:4px;">Karakter ${idx+1} (${char})</div>
+          <div class="writer-display-space" id="modal-target-${idx}" style="width:120px; height:120px;"></div>
+        `;
+        container.appendChild(box);
+
+        const writer = HanziWriter.create(`modal-target-${idx}`, char, {
+          width: 110,
+          height: 110,
+          padding: 4,
+          showOutline: true,
+          strokeColor: '#e5a93c',
+          outlineColor: '#4a151b'
+        });
+        modalWriters.push(writer);
+      });
+
+      document.getElementById('detailModal').classList.add('show');
+      animateModalStrokes();
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('show');
+    }
+
+    function animateModalStrokes() {
+      modalWriters.forEach((writer, i) => {
+        setTimeout(() => {
+          writer.animateCharacter();
+        }, i * 800);
+      });
+    }
+
+    function playAudio() {
+      if (currentItem) playAudioText(currentItem.hanzi);
+    }
+
+    function playAudioText(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-CN';
+        utterance.rate = 0.8;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    /* MENULIS MULTI-HANZI UNTUK KANVAS & ANIMASI */
+    function onSelectVocabToPractice(word) {
+      const container = document.getElementById('multiWritingContainer');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      practiceWriters = [];
+      canvasContexts = [];
+
+      const characters = word.replace(/[^\u4e00-\u9fa5]/g, '').split('');
+
+      let htmlContent = `
+        <div class="multi-section-title">1. Contoh / Animasi Goresan (${characters.length} Karakter)</div>
+        <div class="multi-space-grid">
+          ${characters.map((char, index) => `
+            <div class="writing-box-single">
+              <div style="color: var(--gold-bright); font-weight:600; font-size:0.85rem; margin-bottom:6px;">Karakter ${index+1}:${char}</div>
+              <div class="writer-display-space" id="writer-target-${index}"></div>
+              <button class="btn-action" style="font-size:0.8rem; padding: 4px 10px;" onclick="playSingleAnimation(${index})">▶ Animasi</button>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="multi-section-title">2. Kanvas Latihan Menulis (${characters.length} Space Kanvas)</div>
+        <div class="multi-space-grid">
+          ${characters.map((char, index) => `
+            <div class="writing-box-single">
+              <div style="color: var(--gold-bright); font-weight:600; font-size:0.85rem; margin-bottom:6px;">Tulis Karakter ${index+1} (${char})</div>
+              <canvas id="paintCanvas-${index}" width="140" height="140" style="background:#120305; border: 2px dashed var(--gold-primary); border-radius: 16px; cursor: crosshair;"></canvas>
+              <div style="margin-top: 6px;">
+                <button class="btn-action btn-secondary" style="font-size:0.8rem; padding: 4px 10px;" onclick="clearSingleCanvas(${index})">🗑️ Hapus</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      container.innerHTML = htmlContent;
+
+      characters.forEach((char, index) => {
+        const writer = HanziWriter.create(`writer-target-${index}`, char, {
+          width: 130,
+          height: 130,
+          padding: 5,
+          showOutline: true,
+          strokeColor: '#e5a93c',
+          outlineColor: '#4a151b'
+        });
+        practiceWriters.push(writer);
+
+        initCanvasForIndex(index);
+      });
+
+      playAllAnimations();
+    }
+
+    function playSingleAnimation(index) {
+      if (practiceWriters[index]) {
+        practiceWriters[index].animateCharacter();
+      }
+    }
+
+    function playAllAnimations() {
+      practiceWriters.forEach((writer, i) => {
+        setTimeout(() => {
+          writer.animateCharacter();
+        }, i * 1000);
+      });
+    }
+
+    function initCanvasForIndex(index) {
+      const canvas = document.getElementById(`paintCanvas-${index}`);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.strokeStyle = '#ffd166';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      canvasContexts[index] = { canvas, ctx, isDrawing: false };
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+      }
+
+      function startDraw(e) {
+        canvasContexts[index].isDrawing = true;
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+      }
+
+      function draw(e) {
+        if (!canvasContexts[index].isDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      }
+
+      function stopDraw() {
+        canvasContexts[index].isDrawing = false;
+      }
+
+      canvas.onmousedown = startDraw;
+      canvas.onmousemove = draw;
+      canvas.onmouseup = stopDraw;
+      canvas.ontouchstart = startDraw;
+      canvas.ontouchmove = draw;
+      canvas.ontouchend = stopDraw;
+    }
+
+    function clearSingleCanvas(index) {
+      if (canvasContexts[index]) {
+        const { canvas, ctx } = canvasContexts[index];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    function clearAllCanvases() {
+      canvasContexts.forEach((item, index) => {
+        clearSingleCanvas(index);
+      });
+    }
+
+    window.onload = function() {
+      renderPage();
+    };
+  </script>
+</body>
+</html>
